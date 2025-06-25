@@ -6,8 +6,11 @@ from django.views import generic
 import smtplib
 import random
 from django.urls import reverse
-# Create your views here.
+import os
+from dotenv import load_dotenv
 
+# Create your views here.
+load_dotenv()
 
 class SignUP(generic.ListView):
     template_name = 'authorization/signup.html'
@@ -35,8 +38,8 @@ def getUserData(request):
             return render(request, 'authorization/signup.html', {'error_message':"Password do not match!"})
     
         random_otp = random.randint(1000,9999)
-        sender_email = 'yzendric@gmail.com'
-        app_password = 'fwnv bctn ujsq ikbh'
+        sender_email = os.environ.get('SENDER_EMAIL')
+        app_password = os.environ.get('APP_PASSWORD')
         receiver_email = email
 
         subject = "OTP verification from front page clone"
