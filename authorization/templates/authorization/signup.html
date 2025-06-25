@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign UP</title>
+</head>
+<body>
+    {% if show_otp %}
+    <form action="{% url 'authorization:otpverify' %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend><h1>VERIFY OTP</h1>
+                {% if error_message %}
+                <h2>{{error_message}}</h2>
+                {% endif %}
+                <input type="number" name="user_otp" min="1000", max="9999" required>
+            </legend>
+            <input type="submit" value="submit">
+        </fieldset>
+    </form>
+    {% else %}
+    <form action="{% url 'authorization:getUserData' %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend><h1>Sign UP</h1></legend>
+            {% if error_message %}
+            <p><strong>{{ error_message }}</strong></p>
+            {% endif %}
+            <p>Username</p><input type="text" name="username">
+            <p>Email</p><input type="email" name="email">
+            <p>Password</p><input type="password" name="password">
+            <p>Again?</p><input type="password" name="password_confirm">
+        </fieldset>
+        <input type="submit" value="signup">
+    </form>
+    {% endif %}
+</body>
+</html>
