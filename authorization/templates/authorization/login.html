@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <form action="{% url 'authorization:loginCheck' %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Login</legend>
+            {% if error_message %}
+            <p>{{ error_message }}</p>
+            {% endif %}
+            <p>Username</p> <input type="text" name="username">
+            <p>Password</p> <input type="password" name="password">
+            <input type="submit" value="submit">
+        </fieldset>
+    </form>
+</body>
+</html>

@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from .models import UserCreds
 from django.http import HttpResponseRedirect
 from django.views import generic
 import smtplib
 import random
 from django.urls import reverse
+from django.views.generic import TemplateView
 import os
 from dotenv import load_dotenv
 
@@ -20,11 +22,37 @@ class Index(generic.DetailView):
     model = UserCreds
     context_object_name = 'user'
     template_name = 'authorization/index.html'
-
     def get_object(self):
-        username = self.request.session.get('just_signed_up')
-        return get_object_or_404(UserCreds, username=username)
+        username = 'N/A'
+        if self.request.user.is_authenticated:
+            username = self.request.user
+        return username
+class LoginPage(TemplateView):
+    template_name = 'authorization/login.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        error_message = self.request.session.pop('error_message', None)
+        if error_message:
+            context['error_message'] = error_message
+        return context
 
+def loginCheck(request):
+    try:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print(username)
+        print(password)
+    except:
+        request.session['error_message'] = "Fill all the fields Properly!"
+        return redirect('authorization:login')
+
+    userAfterLogin = authenticate(username=username, password=password)
+    if userAfterLogin is not None:
+        login(request,userAfterLogin)
+        return HttpResponseRedirect(reverse("stockslist:index"))
+    else:
+        request.session['error_message'] = "Incorrect username or password!"
+        return redirect("authorization:login")
 def getUserData(request):
     try:
         username = request.POST.get('username')
@@ -79,7 +107,11 @@ def verifyOTP(request):
         request.session['otp_tries']+=1
         return render(request, 'authorization/signup.html', {"show_otp": True, "error_message":"Incorrect OTP! Try Again", 'email':signup_data['email']})
     user = User.objects.create_user(username=signup_data['username'], email=signup_data['email'], password=signup_data['password'])
+    user.save()
+    user = authenticate(request, username=signup_data['username'], password=signup_data['password'])
     new_user = UserCreds.objects.create(username=signup_data['username'], email=signup_data['email'])
+    new_user.save()
     request.session.flush()
-    request.session['just_signed_up'] = signup_data['username']
-    return HttpResponseRedirect(reverse("authorization:index"))
+    if user:
+        login(request, user)
+        return redirect("authorization:index")

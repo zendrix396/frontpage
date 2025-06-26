@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 # Create your views here.
 from django.views.generic.base import TemplateView
 from nsepython import *
+from authorization.models import UserCreds
 class Index(TemplateView):
     template_name = 'stockslist/index.html'
     def get_context_data(self, **kwargs):
@@ -18,4 +19,9 @@ class Index(TemplateView):
             company['pChange'] = stock.get("pChange", 'N/A')
             data.append(company)
         context['data'] = data
+        if self.request.user.is_authenticated:
+            print("authenticated")
+            context['fetchUser'] = self.request.user
+        else:
+            context['fetchUser'] = None
         return context

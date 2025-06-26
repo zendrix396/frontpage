@@ -16,8 +16,13 @@
     <p>Day Low: ₹{{company.dayLow}}</p>
     <p>Last Price: ₹{{company.lastPrice}}</p>
     <p>Change: ₹{{company.pChange}}</p>
+    {% if fetchUser %}
     <input type="button" value="Buy">
     <input type="button" value="Sell">
+    {% else %}
+    <input type="button" value="Buy" disabled>
+    <input type="button" value="Sell" disabled>
+    {% endif %}
     </fieldset>
     </form>
     {% endfor %}
