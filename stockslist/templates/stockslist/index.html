@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>stocks</title>
+</head>
+<body>
+    {% for company in data %}
+    <form action="{% url 'stockslist:buy' %}" method="POST">
+    <fieldset style="width: 450px; text-align: center;">
+        <legend>
+    <h3>{{company.name}} ({{company.symbol}})</h3>
+</legend>
+    <p>Day High: ₹{{company.dayHigh}}</p>
+    <p>Day Low: ₹{{company.dayLow}}</p>
+    <p>Last Price: ₹{{company.lastPrice}}</p>
+    <p>Change: ₹{{company.pChange}}</p>
+    <input type="button" value="Buy">
+    <input type="button" value="Sell">
+    </fieldset>
+    </form>
+    {% endfor %}
+</body>
+</html>
