@@ -10,6 +10,6 @@ class StockOwnership(models.Model):
     user = models.ForeignKey("UserCreds",on_delete=models.CASCADE, related_name='owned_stocks')
     symbol = models.CharField(max_length=10)
     quantity = models.PositiveIntegerField(default=0)
-    average_price = models.FloatField(default=0)
+    brought_prize = models.FloatField(default=0)
     def __str__(self):
         return f"{self.symbol} x {self.quantity}"
