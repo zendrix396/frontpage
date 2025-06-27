@@ -27,10 +27,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_MAX_LOOP_INTERVAL = 1 # seconds
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django_celery_results', 
+    'django_celery_beat',
     'stockslist',
     'authorization',
     'django.contrib.admin',
@@ -78,6 +83,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {"timeout":20}
     }
 }
 

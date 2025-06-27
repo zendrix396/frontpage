@@ -10,11 +10,11 @@
     <form action="{% url 'stockslist:buy' %}" method="POST">
     <fieldset style="width: 450px; text-align: center;">
         <legend>
-    <h3>{{company.name}} ({{company.symbol}})</h3>
+    <h3 value="companySymbol">{{company.name}} ({{company.symbol}})</h3>
 </legend>
     <p>Day High: ₹{{company.dayHigh}}</p>
     <p>Day Low: ₹{{company.dayLow}}</p>
-    <p>Last Price: ₹{{company.lastPrice}}</p>
+    <p value="lastPrice">Last Price: ₹{{company.lastPrice}}</p>
     <p>Change: ₹{{company.pChange}}</p>
     {% if fetchUser %}
     <input type="button" value="Buy">
