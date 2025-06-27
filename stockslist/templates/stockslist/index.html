@@ -3,31 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>stocks</title>
+    <title>Stocks</title>
 </head>
 <body>
+
     {% for company in data %}
     <form action="{% url 'stockslist:buy' %}" method="POST">
         {% csrf_token %}
-    <fieldset style="width: 450px; text-align: center;">
-        <legend>
-    <h3 value="companySymbol">{{company.name}} ({{company.symbol}})</h3>
-</legend>
-    <p>Day High: ₹{{company.dayHigh}}</p>
-    <p>Day Low: ₹{{company.dayLow}}</p>
-    <p value="lastPrice">Last Price: ₹{{company.lastPrice}}</p>
-    <p>Change: ₹{{company.pChange}}</p>
-    <input type="hidden" name="companySymbol" value="{{ company.symbol }}">
-    <input type="hidden" name="lastPrice" value="{{ company.lastPrice }}">
-    {% if fetchUser %}
-    <button type="submit" name= "buy" value="Buy">Buy</button>
-    <button type="submit" name = "sell" value="Sell">Sell</button>
-    {% else %}
-    <button type="submit" name='buy' value="Buy" disabled>Buy</button>
-    <button type="submit" name= 'sell' value="Sell" disabled>Sell</button>
-    {% endif %}
-    </fieldset>
+        <fieldset style="width: 450px; text-align: center;" data-symbol="{{ company.symbol }}">
+            <legend>
+                <h3>{{ company.name }} ({{ company.symbol }})</h3>
+            </legend>
+            <p class="dayHigh">Day High: ₹{{ company.dayHigh }}</p>
+            <p class="dayLow">Day Low: ₹{{ company.dayLow }}</p>
+            <p class="lastPrice">Last Price: ₹{{ company.lastPrice }}</p>
+            <p class="pChange">Change: {{ company.pChange }}%</p>
+
+            <input type="hidden" name="companySymbol" value="{{ company.symbol }}">
+            <input type="hidden" name="lastPrice" class="priceInput" value="{{ company.lastPrice }}">
+
+            {% if fetchUser %}
+                <button type="submit" name="buy" value="Buy">Buy</button>
+                <button type="submit" name="sell" value="Sell">Sell</button>
+            {% else %}
+                <button type="submit" name="buy" value="Buy" disabled>Buy</button>
+                <button type="submit" name="sell" value="Sell" disabled>Sell</button>
+            {% endif %}
+        </fieldset>
     </form>
     {% endfor %}
 </body>
+
+<script>
+    async function fetchLiveData() {
+        try {
+            const response = await fetch("{% url 'stockslist:live_api' %}");
+            const data = await response.json();
+
+            data.forEach(stock => {
+                const fieldset = document.querySelector(`fieldset[data-symbol="${stock.symbol}"]`);
+                if (fieldset) {
+                    fieldset.querySelector('.dayHigh').textContent = `Day High: ₹${stock.dayHigh}`;
+                    fieldset.querySelector('.dayLow').textContent = `Day Low: ₹${stock.dayLow}`;
+                    fieldset.querySelector('.lastPrice').textContent = `Last Price: ₹${stock.lastPrice}`;
+                    fieldset.querySelector('.pChange').textContent = `Change: ${stock.pChange}%`;
+
+                    const input = fieldset.querySelector('.priceInput');
+                    if (input) input.value = stock.lastPrice;
+                }
+            });
+        } catch (error) {
+            console.error("Live update error:", error);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchLiveData();  
+        setInterval(fetchLiveData, 3000); 
+    });
+</script>
 </html>
