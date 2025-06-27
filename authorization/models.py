@@ -4,4 +4,12 @@ from django.db import models
 class UserCreds(models.Model):
     username = models.CharField(max_length=20) 
     email = models.EmailField("this is email field")
-    amount = models.IntegerField(default=1000000)
+    amount = models.FloatField(default=1000000.00)
+
+class StockOwnership(models.Model):
+    user = models.ForeignKey("UserCreds",on_delete=models.CASCADE, related_name='owned_stocks')
+    symbol = models.CharField(max_length=10)
+    quantity = models.PositiveIntegerField(default=0)
+    average_price = models.FloatField(default=0)
+    def __str__(self):
+        return f"{self.symbol} x {self.quantity}"

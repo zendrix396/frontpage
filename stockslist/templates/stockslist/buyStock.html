@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Purchase for {{stock.name}}</title>
+</head>
+<body>
+    <form action="{% url 'stockslist:confirmPurchase' %}" method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend>
+                Stock name: {{ stock.symbol }}
+            </legend>
+            {% if error_message %}
+            <p>{{ error_message }}</p>
+            {% endif %}
+            <p>Buying Price: ₹<span id="price">{{ stock.lastPrice }}</span></p>
+            <p>Your Budget: ₹{{ stock.budget }}</p>
+
+            Share Quantity:
+            <input type="number" id="quantity" name="quantity" min="1" max="{{ stock.maxStockBuy }}">
+            <span>Max Stock you can Buy: {{stock.maxStockBuy}}</span>
+            <p>Total Price: ₹<span id="total">0</span></p>
+            <input type="hidden" name="lastPrice" value="{{ stock.lastPrice }}">
+            <input type="hidden" name="symbol" value="{{ stock.symbol }}">
+
+            <button type="submit">Buy</button>
+        </fieldset>
+    </form>
+
+    <script>
+        const price = parseFloat(document.getElementById("price").innerText);
+        const quantityInput = document.getElementById("quantity");
+        const totalDisplay = document.getElementById("total");
+
+        quantityInput.addEventListener("input", function () {
+            const quantity = parseInt(quantityInput.value) || 0;
+            const total = price * quantity;
+            totalDisplay.innerText = total.toFixed(2);
+        });
+    </script>
+</body>
+</html>

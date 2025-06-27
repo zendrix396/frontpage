@@ -25,8 +25,8 @@ class Index(generic.DetailView):
     def get_object(self):
         username = 'N/A'
         if self.request.user.is_authenticated:
-            username = self.request.user
-        return username
+            return get_object_or_404(UserCreds,username=self.request.user.username)
+        return None
 class LoginPage(TemplateView):
     template_name = 'authorization/login.html'
     def get_context_data(self, **kwargs):
