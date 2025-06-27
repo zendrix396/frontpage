@@ -6,3 +6,4 @@ db.sqlite3
 *.dir
 dump.rdb
 __pycache__/
+migrations/
