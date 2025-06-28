@@ -8,6 +8,6 @@ class Stock(models.Model):
     dayLow = models.FloatField(max_length=20)
     lastPrice = models.FloatField(max_length=20)
     pChange = models.FloatField(max_length=20)
-    base_price = models.IntegerField()
+    # base_price = models.IntegerField()
     def __str__(self):
         return f"{self.symbol} - {self.name}"

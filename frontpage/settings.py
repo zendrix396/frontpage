@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 CELERY_BROKER_URL = "redis://localhost:6379/0"
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_BEAT_MAX_LOOP_INTERVAL = 1 # seconds
+CELERY_BEAT_MAX_LOOP_INTERVAL = 3 # seconds
 
 # Application definition
 
