@@ -7,4 +7,7 @@ urlpatterns = [
     path('buy/', views.buy, name='buy'),
     path('confirmPurchase/', views.confirmPurchase, name='confirmPurchase'),
     path('api/liveapi', views.stock_data_json, name='live_api'),
+    path('purchaseSuccess/', views.purchaseSuccess, name='purchaseSuccess'),
+    path('dashboard/', views.Dashboard.as_view(), name='dashboard'),
+    path('api/liveprofit', views.live_profit, name='live_profit'),
 ]

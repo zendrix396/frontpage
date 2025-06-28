@@ -9,12 +9,14 @@
     <h2>✅ Purchase Successful!</h2>
     <p>You have successfully bought:</p>
     <ul>
-        <li>Symbol: {{ stock.symbol }}</li>
-        <li>Quantity: {{ stock.quantity }}</li>
-        <li>Average Buy Price: ₹{{ stock.average_price }}</li>
+        <li>Symbol: {{ data.symbol }}</li>
+        <li>Quantity: {{ data.quantity }}</li>
+        <li>Buy Price: ₹{{ data.brought_prize }}</li>
+        <li>Buy Time: {{ data.buy_time }}</li>
+        <li>Total Cost: ₹{{ data.total_cost}}</li>
     </ul>
 
-    <p>Your new balance: ₹{{ user.amount }}</p>
+    <p>Your new balance: ₹{{ data.amount_left }}</p>
 
     <a href="{% url 'stockslist:index' %}">Go back to Home</a>
 </body>

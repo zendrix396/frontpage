@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{user.username}}'s Dashboard</title>
+</head>
+<body>
+    <h1>{{user.username}} Dashboard</h1>
+    {% for purchase in data %}
+    <fieldset data-symbol="{{purchase.id}}">
+        <p>Stock name: {{purchase.symbol}}</p>
+        <p>Quantity: {{purchase.quantity}}</p>
+        <p class="profit">Profit/Loss: {{purchase.profit}}</p>
+    </fieldset>
+
+    {% endfor %}
+</body>
+<script>
+    async function fetchLiveData(){
+        try{
+            const response = await fetch("{% url 'stockslist:live_profit' %}")
+            const data = await response.json()
+            data.forEach(stock=>{
+                const fieldset = document.querySelector(`fieldset[data-symbol="${stock.id}"]`)
+                if (fieldset){
+                    fieldset.querySelector('.profit').textContent = `Profit/Loss: ${stock.profit}`;
+                }
+            });
+        } catch (error){
+            console.error("Live update error: ", error)
+        }
+    }
+    document.addEventListener("DOMContentLoaded", ()=>{
+        fetchLiveData();
+        setInterval(fetchLiveData, 2200);
+    })
+</script>
+</html>

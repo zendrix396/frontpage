@@ -6,7 +6,7 @@
     <title>Stocks</title>
 </head>
 <body>
-
+    <a href="{% url 'stockslist:dashboard' %}">Dashboard</a>
     {% for company in data %}
     <form action="{% url 'stockslist:buy' %}" method="POST">
         {% csrf_token %}

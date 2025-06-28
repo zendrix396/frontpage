@@ -1,6 +1,7 @@
 from celery import shared_task
 from nsepython import nsefetch
 from .models import Stock
+from authorization.models import StockOwnership, UserCreds
 from decimal import Decimal, ROUND_HALF_UP
 import numpy as np
 @shared_task
@@ -26,8 +27,12 @@ def fetch_stock_data():
         stock.save()
 
         print(f"Updated {stock.symbol}: ₹{stock.lastPrice} ({stock.pChange}%)")
-
-
+    for user in UserCreds.objects.all():
+        for stuff in user.owned_stocks.all():
+            print("setting profits")
+            stock = Stock.objects.get(symbol=stuff.symbol)
+            stuff.profit =round((stuff.quantity*stock.lastPrice)-(stuff.quantity*stuff.brought_prize),2)
+            stuff.save()
     # positions = nsefetch("https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O")
     # for stock in positions['data']:
     #     symbol = stock.get('meta',{}).get("symbol")
