@@ -4,6 +4,7 @@ from django.views.generic.base import TemplateView
 from django.views import generic
 from nsepython import *
 from .models import Stock
+from django.utils.timezone import localtime
 from django.db.models import F
 from authorization.models import UserCreds, StockOwnership
 from django.http import JsonResponse
@@ -16,15 +17,18 @@ class Index(TemplateView):
         return context
 def confirmPurchase(request):
     try:
+        symbol = request.POST.get("symbol")
+        if symbol == None:
+            return redirect("stockslist:index")
         quantity = int(request.POST.get('quantity'))
         last_price = float(request.POST.get('lastPrice'))
         cost = round(quantity* last_price,2)
-        symbol = request.POST.get("symbol")
     except:
         return render(request, 'stockslist/buyStock.html', context={'error_message':"Please fill the input fields properly!"})
+    print(quantity)
     buying_user = get_object_or_404(UserCreds, username=request.user.username)
     
-    buying_user.amount = F("amount")-cost
+    buying_user.amount = F("amount")-round(cost,2)
     buying_user.save()
     buying_user.refresh_from_db()
     stock, created = StockOwnership.objects.get_or_create(
@@ -39,16 +43,29 @@ def confirmPurchase(request):
         request.session['purchase_data'] = {
             'symbol': stock.symbol,
             'quantity': stock.quantity,
-            'buy_time': stock.buy_time.strftime("%b %d, %Y, %I:%M %p"),
+            'brought_prize': stock.brought_prize,
+            'buy_time': localtime(stock.buy_time).strftime("%b %d, %Y, %I:%M %p"),
             'amount': buying_user.amount,
         }
         return redirect('stockslist:purchaseSuccess')
 
+class Dashboard(generic.TemplateView):
+    template_name = 'stockslist/dashboard.html'
+    def get_context_data(self, **kwargs):
+        context= super().get_context_data(**kwargs)
+        user = UserCreds.objects.get(username=self.request.user.username)
+        context['data'] = user.owned_stocks.all()
+        context['fetchUser'] = user
+        return context
+
+
 def purchaseSuccess(request):
     purchase_data = request.session.get('purchase_data', None)
+    purchase_data['total_cost'] = purchase_data['brought_prize']*purchase_data['quantity']
+    purchase_data['amount_left'] = get_object_or_404(UserCreds, username=request.user.username).amount
     if not purchase_data:
         return redirect('stockslist:index')
-    return render(request, 'stockslist/successBuy.html', context={'stock':purchase_data})
+    return render(request, 'stockslist/successBuy.html', context={'data':purchase_data})
 
 def buy(request):
     try:
@@ -80,5 +97,18 @@ def stock_data_json(request):
             "pChange": s.pChange
         }
         for s in stocks
+    ]
+    return JsonResponse(data, safe=False)
+def live_profit(request):
+    user_ = UserCreds.objects.get(username=request.user)
+    purchase = user_.owned_stocks.all()
+    data = [
+        {
+            'id':stock.id,
+            'profit': stock.profit,
+            'symbol': stock.symbol,
+            'buy_time':stock.buy_time,
+        }
+        for stock in purchase
     ]
     return JsonResponse(data, safe=False)

@@ -11,5 +11,7 @@ class StockOwnership(models.Model):
     symbol = models.CharField(max_length=10)
     quantity = models.PositiveIntegerField(default=0)
     brought_prize = models.FloatField(default=0)
+    buy_time = models.DateTimeField(auto_now_add=True)
+    profit = models.FloatField(default=0)
     def __str__(self):
         return f"{self.symbol} x {self.quantity}"
