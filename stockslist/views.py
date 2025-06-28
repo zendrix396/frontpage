@@ -54,20 +54,18 @@ def buy(request):
     try:
         companySymbol = request.POST.get("companySymbol")
         lastPrice = float(request.POST.get("lastPrice"))
-        buyCheck = True if "buy" in request.POST else False if "sell" in request.POST else None
     except:
         request.session['error_message'] = "Cannot fetch data"
         return redirect("stockslist:index")
     print(companySymbol)
     print(lastPrice)
 
-    print(buyCheck)
     userBudget = get_object_or_404(UserCreds, username=request.user.username).amount
     context = {'stock':{'symbol':companySymbol, 'lastPrice':lastPrice, 'budget':userBudget}}
-    if buyCheck:
-        maxStockBuy = userBudget//lastPrice
-        context['stock']['maxStockBuy'] = int(maxStockBuy)
-        return render(request, "stockslist/buyStock.html", context=context)
+
+    maxStockBuy = userBudget//lastPrice
+    context['stock']['maxStockBuy'] = int(maxStockBuy)
+    return render(request, "stockslist/buyStock.html", context=context)
 def stock_data_json(request):
     stocks = Stock.objects.all()
     data = [
