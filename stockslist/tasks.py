@@ -3,7 +3,6 @@ from nsepython import nsefetch
 from .models import Stock
 from decimal import Decimal, ROUND_HALF_UP
 import numpy as np
-import random
 @shared_task
 def fetch_stock_data():
     print("Fetching stock data...")
