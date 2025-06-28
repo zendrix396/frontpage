@@ -4,7 +4,7 @@
 -> unrealized/realized gain
 -> sell stock option
 -> user profile on '/'
-# bug: if already created email being given to sign up
+### bug: if already created email being given to sign up [fixed] ✅
 ## celery setup commands: 
 ```bash
 # terminal 1

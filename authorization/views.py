@@ -62,6 +62,9 @@ def getUserData(request):
     except:
         return render(request, 'authorization/signup.html', {'error_message':"Enter valid data!"})
     else:
+        if not all([username, password, password_confirm, email]):
+            return render(request, 'authorization/signup.html', {'error_message': "All fields are required!"})
+    
         if password != password_confirm:
             return render(request, 'authorization/signup.html', {'error_message':"Password do not match!"})
     
@@ -69,6 +72,11 @@ def getUserData(request):
         sender_email = os.environ.get('SENDER_EMAIL')
         app_password = os.environ.get('APP_PASSWORD')
         receiver_email = email
+        confirmation = [UserCreds.objects.filter(username=username).first(), UserCreds.objects.filter(email=email).first()]
+        print(confirmation)
+        if confirmation.count(None)<2:
+            return render(request, 'authorization/signup.html', {'error_message':"User already exist with same credentials"})
+
 
         subject = "OTP verification from front page clone"
         body = f"Hello! Your OTP for front page clone app is {random_otp}"
