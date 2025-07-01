@@ -10,4 +10,5 @@ urlpatterns = [
     path('purchaseSuccess/', views.purchaseSuccess, name='purchaseSuccess'),
     path('dashboard/', views.Dashboard.as_view(), name='dashboard'),
     path('api/liveprofit', views.live_profit, name='live_profit'),
+    path('sell/', views.sell, name='sell'),
 ]

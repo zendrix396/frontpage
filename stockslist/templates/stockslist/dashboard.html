@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +9,25 @@
 </head>
 <body>
     <h1>{{user.username}} Dashboard</h1>
+    <p>User Amount: {{user.amount}}</p>
+    <p>Realized Gain: {{user.realized_gain}} </p>
+    <p class="unrealized_gain">Unrealized Gain: {{user.unrealized_gain}}</p>
+    {% if error_message %}
+    <p>{{error_message}}</p>
+    {% endif %}
     {% for purchase in data %}
-    <fieldset data-symbol="{{purchase.id}}">
-        <p>Stock name: {{purchase.symbol}}</p>
-        <p>Quantity: {{purchase.quantity}}</p>
-        <p>Bought Prize: {{purchase.brought_prize}}</p>
-        <p class="lastPrice">Last Prize: {{purchase.brought_prize|add:purchase.profit}}</p>
-        <p class="profit">Profit/Loss: {{purchase.profit}}</p>
-    </fieldset>
+    <form action="{% url 'stockslist:sell' %}" method="POST">
+        {% csrf_token %}
+        <fieldset data-symbol="{{purchase.id}}">
+            <p>Stock name: {{purchase.symbol}}</p>
+            <p>Quantity: {{purchase.quantity}}</p>
+            <p>Bought Prize: {{purchase.brought_prize}}</p>
+            <p class="lastPrice">Last Prize: {{purchase.last_price}}</p>
+            <p class="profit">Profit/Loss: {{purchase.quantity|multiply:purchase.profit}}</p>
+            <input type="hidden" name="id" value="{{purchase.id}}">
+            <input type="submit" value="Sell">
+        </fieldset>
+    </form>
 
     {% endfor %}
 </body>
@@ -26,9 +39,10 @@
             data.forEach(stock=>{
                 const fieldset = document.querySelector(`fieldset[data-symbol="${stock.id}"]`)
                 if (fieldset){
-                    fieldset.querySelector('.profit').textContent = `Profit/Loss: ${stock.profit}`;
-                    fieldset.querySelector('.lastPrice').textContent = `Last Prize: ${stock.profit+stock.brought_prize}`;
+                    fieldset.querySelector('.profit').textContent = `Profit/Loss: ${(stock.profit).toFixed(2)}`;
+                    fieldset.querySelector('.lastPrice').textContent = `Last Prize: ${(stock.lastPrice).toFixed(2)}`;
                 }
+                document.querySelector('.unrealized_gain').textContent = `Unrealized Gain: ${stock.unrealized_gain}` 
             });
         } catch (error){
             console.error("Live update error: ", error)

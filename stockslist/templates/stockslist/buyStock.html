@@ -36,8 +36,8 @@
 
         quantityInput.addEventListener("input", function () {
             const quantity = parseInt(quantityInput.value) || 0;
-            const total = price * quantity;
-            totalDisplay.innerText = total.toFixed(2);
+            const total = (price * quantity).toFixed(2);
+            totalDisplay.innerText = total;
         });
     </script>
 </body>
