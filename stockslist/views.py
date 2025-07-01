@@ -8,6 +8,12 @@ from django.utils.timezone import localtime
 from django.db.models import F
 from authorization.models import UserCreds, StockOwnership
 from django.http import JsonResponse
+from django import template
+
+register = template.Library()
+@register.filter
+def add(value,arg):
+    return value+arg
 class Index(TemplateView):
     template_name = 'stockslist/index.html'
     def get_context_data(self, **kwargs):
@@ -58,7 +64,6 @@ class Dashboard(generic.TemplateView):
         context['fetchUser'] = user
         return context
 
-
 def purchaseSuccess(request):
     purchase_data = request.session.get('purchase_data', None)
     purchase_data['total_cost'] = purchase_data['brought_prize']*purchase_data['quantity']
@@ -108,6 +113,7 @@ def live_profit(request):
             'profit': stock.profit,
             'symbol': stock.symbol,
             'buy_time':stock.buy_time,
+            'brought_prize':stock.brought_prize
         }
         for stock in purchase
     ]

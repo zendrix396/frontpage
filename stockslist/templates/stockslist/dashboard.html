@@ -11,6 +11,8 @@
     <fieldset data-symbol="{{purchase.id}}">
         <p>Stock name: {{purchase.symbol}}</p>
         <p>Quantity: {{purchase.quantity}}</p>
+        <p>Bought Prize: {{purchase.brought_prize}}</p>
+        <p class="lastPrice">Last Prize: {{purchase.brought_prize|add:purchase.profit}}</p>
         <p class="profit">Profit/Loss: {{purchase.profit}}</p>
     </fieldset>
 
@@ -25,6 +27,7 @@
                 const fieldset = document.querySelector(`fieldset[data-symbol="${stock.id}"]`)
                 if (fieldset){
                     fieldset.querySelector('.profit').textContent = `Profit/Loss: ${stock.profit}`;
+                    fieldset.querySelector('.lastPrice').textContent = `Last Prize: ${stock.profit+stock.brought_prize}`;
                 }
             });
         } catch (error){

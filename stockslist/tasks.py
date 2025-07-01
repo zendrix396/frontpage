@@ -31,17 +31,18 @@ def fetch_stock_data():
         symbol = stock.get('meta',{}).get("symbol")
         if not symbol:
             continue
-        Stock.objects.update_or_create(
-            symbol=symbol,
-            defaults= {
-                'name': stock.get("meta", {}).get("companyName", "N/A"),
-                    'dayHigh': stock.get("dayHigh", "N/A"),
-                    'dayLow': stock.get("dayLow", "N/A"),
-                    'lastPrice': stock.get("lastPrice", "N/A"),
-                    'pChange': stock.get("pChange", "N/A"),
-            }
-        )
-        print(f"Updated {stock.symbol}: ₹{stock.lastPrice} ({stock.pChange}%)")
+        stock_obj, created = Stock.objects.update_or_create(
+        symbol=symbol,
+        defaults={
+            'name': stock.get("meta", {}).get("companyName", "N/A"),
+            'dayHigh': stock.get("dayHigh", 0.0),
+            'dayLow': stock.get("dayLow", 0.0),
+            'lastPrice': stock.get("lastPrice", 0.0),
+            'pChange': stock.get("pChange", 0.0),
+        }
+    )
+    print(f"Updated {stock_obj.symbol}: ₹{stock_obj.lastPrice} ({stock_obj.pChange}%)")
+
     for user in UserCreds.objects.all():
         for stuff in user.owned_stocks.all():
             print("setting profits")
