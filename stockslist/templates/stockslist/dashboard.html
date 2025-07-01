@@ -1,48 +1,94 @@
+{% extends 'stockslist/base.html' %}
+{% load static %}
 {% load custom_filters %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{user.username}}'s Dashboard</title>
-</head>
-<body>
-    <h1>{{user.username}} Dashboard</h1>
-    <p>User Amount: {{user.amount}}</p>
-    <p>Realized Gain: {{user.realized_gain}} </p>
-    <p class="unrealized_gain">Unrealized Gain: {{user.unrealized_gain}}</p>
-    {% if error_message %}
-    <p>{{error_message}}</p>
-    {% endif %}
-    {% for purchase in data %}
-    <form action="{% url 'stockslist:sell' %}" method="POST">
-        {% csrf_token %}
-        <fieldset data-symbol="{{purchase.id}}">
-            <p>Stock name: {{purchase.symbol}}</p>
-            <p>Quantity: {{purchase.quantity}}</p>
-            <p>Bought Prize: {{purchase.brought_prize}}</p>
-            <p class="lastPrice">Last Prize: {{purchase.last_price}}</p>
-            <p class="profit">Profit/Loss: {{purchase.quantity|multiply:purchase.profit}}</p>
-            <input type="hidden" name="id" value="{{purchase.id}}">
-            <input type="submit" value="Sell">
-        </fieldset>
-    </form>
+{% block title %}{{ user.username }}'s Dashboard | PaperTrade{% endblock %}
 
+{% block content %}
+<h1 class="card-title">{{ user.username }}'s Dashboard</h1>
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <div class="stat-title">Available Balance</div>
+        <div class="stat-value">₹{{ user.amount }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Realized Gain</div>
+        <div class="stat-value {% if user.realized_gain >= 0 %}positive{% else %}negative{% endif %}">
+            ₹{{ user.realized_gain }}
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Unrealized Gain</div>
+        <div class="stat-value unrealized_gain {% if user.unrealized_gain >= 0 %}positive{% else %}negative{% endif %}">
+            ₹{{ user.unrealized_gain }}
+        </div>
+    </div>
+</div>
+
+{% if error_message %}
+<div class="card" style="background-color: var(--error-color); color: white;">
+    <p>{{ error_message }}</p>
+</div>
+{% endif %}
+
+<h2 class="card-title">Your Portfolio</h2>
+
+<div class="stocks-grid">
+    {% for purchase in data %}
+    <div class="stock-card" data-symbol="{{ purchase.id }}">
+        <form action="{% url 'stockslist:sell' %}" method="POST">
+            {% csrf_token %}
+            <div class="stock-header">
+                <span class="stock-name">{{ purchase.symbol }}</span>
+            </div>
+            <div class="stock-details">
+                <div class="stock-detail">
+                    <span>Quantity:</span>
+                    <span>{{ purchase.quantity }}</span>
+                </div>
+                <div class="stock-detail">
+                    <span>Bought Price:</span>
+                    <span>₹{{ purchase.brought_prize }}</span>
+                </div>
+                <div class="stock-detail">
+                    <span>Current Price:</span>
+                    <span class="lastPrice">₹{{ purchase.last_price }}</span>
+                </div>
+                <div class="stock-detail">
+                    <span>Profit/Loss:</span>
+                    <span class="profit {% if purchase.profit >= 0 %}positive{% else %}negative{% endif %}">
+                        ₹{{ purchase.quantity|multiply:purchase.profit }}
+                    </span>
+                </div>
+            </div>
+            <input type="hidden" name="id" value="{{ purchase.id }}">
+            <button type="submit" class="btn btn-danger">Sell</button>
+        </form>
+    </div>
     {% endfor %}
-</body>
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
     async function fetchLiveData(){
         try{
             const response = await fetch("{% url 'stockslist:live_profit' %}")
             const data = await response.json()
             data.forEach(stock=>{
-                const fieldset = document.querySelector(`fieldset[data-symbol="${stock.id}"]`)
-                if (fieldset){
-                    fieldset.querySelector('.profit').textContent = `Profit/Loss: ${(stock.profit).toFixed(2)}`;
-                    fieldset.querySelector('.lastPrice').textContent = `Last Prize: ${(stock.lastPrice).toFixed(2)}`;
+                const stockCard = document.querySelector(`.stock-card[data-symbol="${stock.id}"]`)
+                if (stockCard){
+                    const profitElement = stockCard.querySelector('.profit');
+                    profitElement.textContent = `₹${(stock.profit).toFixed(2)}`;
+                    profitElement.className = `profit ${stock.profit >= 0 ? 'positive' : 'negative'}`;
+                    
+                    stockCard.querySelector('.lastPrice').textContent = `₹${(stock.lastPrice).toFixed(2)}`;
                 }
-                document.querySelector('.unrealized_gain').textContent = `Unrealized Gain: ${stock.unrealized_gain}` 
+                
+                const unrealizedElement = document.querySelector('.unrealized_gain');
+                unrealizedElement.textContent = `₹${stock.unrealized_gain}`;
+                unrealizedElement.className = `unrealized_gain ${stock.unrealized_gain >= 0 ? 'positive' : 'negative'}`;
             });
         } catch (error){
             console.error("Live update error: ", error)
@@ -53,4 +99,4 @@
         setInterval(fetchLiveData, 2200);
     })
 </script>
-</html>
+{% endblock %}

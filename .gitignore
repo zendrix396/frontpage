@@ -8,3 +8,4 @@ dump.rdb
 __pycache__/
 migrations/
 prod_db.sqlite3
+staticfiles/

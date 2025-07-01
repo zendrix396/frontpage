@@ -1,44 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Purchase for {{stock.name}}</title>
-</head>
-<body>
+{% extends 'stockslist/base.html' %}
+{% load static %}
+
+{% block title %}Buy {{ stock.symbol }} | PaperTrade{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 class="card-title">Confirm Purchase for {{ stock.name }}</h1>
+    
+    {% if error_message %}
+    <div class="alert" style="background-color: var(--error-color); color: white; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+        <p>{{ error_message }}</p>
+    </div>
+    {% endif %}
+    
     <form action="{% url 'stockslist:confirmPurchase' %}" method="POST">
         {% csrf_token %}
-        <fieldset>
-            <legend>
-                Stock name: {{ stock.symbol }}
-            </legend>
-            {% if error_message %}
-            <p>{{ error_message }}</p>
-            {% endif %}
-            <p>Buying Price: ₹<span id="price">{{ stock.lastPrice }}</span></p>
-            <p>Your Budget: ₹{{ stock.budget }}</p>
-
-            Share Quantity:
-            <input type="number" id="quantity" name="quantity" min="1" max="{{ stock.maxStockBuy }}">
-            <span>Max Stock you can Buy: {{stock.maxStockBuy}}</span>
-            <p>Total Price: ₹<span id="total">0</span></p>
-            <input type="hidden" name="lastPrice" value="{{ stock.lastPrice }}">
-            <input type="hidden" name="symbol" value="{{ stock.symbol }}">
-
-            <button type="submit">Buy</button>
-        </fieldset>
+        
+        <div class="stock-details">
+            <div class="stock-detail">
+                <span>Stock Symbol:</span>
+                <span>{{ stock.symbol }}</span>
+            </div>
+            <div class="stock-detail">
+                <span>Buying Price:</span>
+                <span>₹<span id="price">{{ stock.lastPrice }}</span></span>
+            </div>
+            <div class="stock-detail">
+                <span>Your Budget:</span>
+                <span>₹{{ stock.budget }}</span>
+            </div>
+            <div class="stock-detail">
+                <span>Max Stock you can Buy:</span>
+                <span>{{ stock.maxStockBuy }}</span>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="quantity">Share Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" max="{{ stock.maxStockBuy }}" class="form-control">
+        </div>
+        
+        <div class="stock-detail">
+            <span>Total Price:</span>
+            <span>₹<span id="total">0</span></span>
+        </div>
+        
+        <input type="hidden" name="lastPrice" value="{{ stock.lastPrice }}">
+        <input type="hidden" name="symbol" value="{{ stock.symbol }}">
+        
+        <button type="submit" class="btn btn-primary">Buy</button>
     </form>
+</div>
+{% endblock %}
 
-    <script>
-        const price = parseFloat(document.getElementById("price").innerText);
-        const quantityInput = document.getElementById("quantity");
-        const totalDisplay = document.getElementById("total");
+{% block scripts %}
+<script>
+    const price = parseFloat(document.getElementById("price").innerText);
+    const quantityInput = document.getElementById("quantity");
+    const totalDisplay = document.getElementById("total");
 
-        quantityInput.addEventListener("input", function () {
-            const quantity = parseInt(quantityInput.value) || 0;
-            const total = (price * quantity).toFixed(2);
-            totalDisplay.innerText = total;
-        });
-    </script>
-</body>
-</html>
+    quantityInput.addEventListener("input", function () {
+        const quantity = parseInt(quantityInput.value) || 0;
+        const total = (price * quantity).toFixed(2);
+        totalDisplay.innerText = total;
+    });
+</script>
+{% endblock %}

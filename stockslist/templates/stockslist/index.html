@@ -1,37 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stocks</title>
-</head>
-<body>
-    <a href="{% url 'stockslist:dashboard' %}">Dashboard</a>
+{% extends 'stockslist/base.html' %}
+{% load static %}
+
+{% block title %}Stocks | PaperTrade{% endblock %}
+
+{% block content %}
+<div class="stocks-grid">
     {% for company in data %}
-    <form action="{% url 'stockslist:buy' %}" method="POST">
-        {% csrf_token %}
-        <fieldset style="width: 450px; text-align: center;" data-symbol="{{ company.symbol }}">
-            <legend>
-                <h3>{{ company.name }} ({{ company.symbol }})</h3>
-            </legend>
-            <p class="dayHigh">Day High: ₹{{ company.dayHigh }}</p>
-            <p class="dayLow">Day Low: ₹{{ company.dayLow }}</p>
-            <p class="lastPrice">Last Price: ₹{{ company.lastPrice }}</p>
-            <p class="pChange">Change: {{ company.pChange }}%</p>
+    <div class="stock-card" data-symbol="{{ company.symbol }}">
+        <form action="{% url 'stockslist:buy' %}" method="POST">
+            {% csrf_token %}
+            <div class="stock-header">
+                <span class="stock-name">{{ company.name }} ({{ company.symbol }})</span>
+                <span class="pChange {% if company.pChange >= 0 %}positive{% else %}negative{% endif %}">{{ company.pChange }}%</span>
+            </div>
+            <div class="stock-details">
+                <div class="stock-detail">
+                    <span>Day High:</span>
+                    <span class="dayHigh">₹{{ company.dayHigh }}</span>
+                </div>
+                <div class="stock-detail">
+                    <span>Day Low:</span>
+                    <span class="dayLow">₹{{ company.dayLow }}</span>
+                </div>
+                <div class="stock-detail">
+                    <span>Last Price:</span>
+                    <span class="lastPrice">₹{{ company.lastPrice }}</span>
+                </div>
+            </div>
 
             <input type="hidden" name="companySymbol" value="{{ company.symbol }}">
             <input type="hidden" name="lastPrice" class="priceInput" value="{{ company.lastPrice }}">
 
             {% if fetchUser %}
-                <button type="submit" name="buy" value="Buy">Buy</button>
+                <button type="submit" name="buy" value="Buy" class="btn btn-primary">Buy</button>
             {% else %}
-                <button type="submit" name="buy" value="Buy" disabled>Buy</button>
+                <button type="submit" name="buy" value="Buy" class="btn btn-primary" disabled>Buy</button>
             {% endif %}
-        </fieldset>
-    </form>
+        </form>
+    </div>
     {% endfor %}
-</body>
+</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
     async function fetchLiveData() {
         try {
@@ -39,14 +50,17 @@
             const data = await response.json();
 
             data.forEach(stock => {
-                const fieldset = document.querySelector(`fieldset[data-symbol="${stock.symbol}"]`);
-                if (fieldset) {
-                    fieldset.querySelector('.dayHigh').textContent = `Day High: ₹${stock.dayHigh}`;
-                    fieldset.querySelector('.dayLow').textContent = `Day Low: ₹${stock.dayLow}`;
-                    fieldset.querySelector('.lastPrice').textContent = `Last Price: ₹${stock.lastPrice}`;
-                    fieldset.querySelector('.pChange').textContent = `Change: ${stock.pChange}%`;
+                const stockCard = document.querySelector(`.stock-card[data-symbol="${stock.symbol}"]`);
+                if (stockCard) {
+                    stockCard.querySelector('.dayHigh').textContent = `₹${stock.dayHigh}`;
+                    stockCard.querySelector('.dayLow').textContent = `₹${stock.dayLow}`;
+                    stockCard.querySelector('.lastPrice').textContent = `₹${stock.lastPrice}`;
+                    
+                    const pChangeElement = stockCard.querySelector('.pChange');
+                    pChangeElement.textContent = `${stock.pChange}%`;
+                    pChangeElement.className = `pChange ${stock.pChange >= 0 ? 'positive' : 'negative'}`;
 
-                    const input = fieldset.querySelector('.priceInput');
+                    const input = stockCard.querySelector('.priceInput');
                     if (input) input.value = stock.lastPrice;
                 }
             });
@@ -60,4 +74,4 @@
         setInterval(fetchLiveData, 3000); 
     });
 </script>
-</html>
+{% endblock %}

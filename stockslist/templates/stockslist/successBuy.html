@@ -1,23 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Success!</title>
-</head>
-<body>
-    <h2>✅ Purchase Successful!</h2>
-    <p>You have successfully bought:</p>
-    <ul>
-        <li>Symbol: {{ data.symbol }}</li>
-        <li>Quantity: {{ data.quantity }}</li>
-        <li>Buy Price: ₹{{ data.brought_prize }}</li>
-        <li>Buy Time: {{ data.buy_time }}</li>
-        <li>Total Cost: ₹{{ data.total_cost}}</li>
-    </ul>
+{% extends 'stockslist/base.html' %}
+{% load static %}
 
-    <p>Your new balance: ₹{{ data.amount_left }}</p>
+{% block title %}Purchase Successful | PaperTrade{% endblock %}
 
-    <a href="{% url 'stockslist:index' %}">Go back to Home</a>
-</body>
-</html>
+{% block content %}
+<div class="success-container">
+    <div class="success-icon">✅</div>
+    <h1>Purchase Successful!</h1>
+    
+    <div class="card success-details">
+        <h2 class="card-title">Transaction Details</h2>
+        <div class="stock-details">
+            <div class="stock-detail">
+                <span>Symbol:</span>
+                <span>{{ data.symbol }}</span>
+            </div>
+            <div class="stock-detail">
+                <span>Quantity:</span>
+                <span>{{ data.quantity }}</span>
+            </div>
+            <div class="stock-detail">
+                <span>Buy Price:</span>
+                <span>₹{{ data.brought_prize }}</span>
+            </div>
+            <div class="stock-detail">
+                <span>Buy Time:</span>
+                <span>{{ data.buy_time }}</span>
+            </div>
+            <div class="stock-detail">
+                <span>Total Cost:</span>
+                <span>₹{{ data.total_cost }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="stock-detail">
+            <span>Your new balance:</span>
+            <span>₹{{ data.amount_left }}</span>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'stockslist:index' %}" class="btn btn-primary">Go back to Home</a>
+        <a href="{% url 'stockslist:dashboard' %}" class="btn btn-secondary">View Dashboard</a>
+    </div>
+</div>
+{% endblock %}

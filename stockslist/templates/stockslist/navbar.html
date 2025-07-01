@@ -1,0 +1,17 @@
+{% load static %}
+
+<nav class="navbar">
+    <div class="navbar-brand">
+        <a href="{% url 'stockslist:index' %}">PaperTrade</a>
+    </div>
+    <div class="navbar-links">
+        <a href="{% url 'stockslist:index' %}" {% if request.path == '/stockslist/' %}class="active"{% endif %}>Stocks</a>
+        <a href="{% url 'stockslist:dashboard' %}" {% if 'dashboard' in request.path %}class="active"{% endif %}>Dashboard</a>
+        {% if user.is_authenticated %}
+            <a href="">Logout</a>
+        {% else %}
+            <a href="{% url 'authorization:login' %}">Login</a>
+            <a href="{% url 'authorization:signup' %}">Sign Up</a>
+        {% endif %}
+    </div>
+</nav> 
