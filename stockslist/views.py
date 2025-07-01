@@ -8,6 +8,7 @@ from django.utils.timezone import localtime
 from django.db.models import F
 from authorization.models import UserCreds, StockOwnership
 from django.http import JsonResponse
+
 class Index(TemplateView):
     template_name = 'stockslist/index.html'
     def get_context_data(self, **kwargs):
@@ -45,7 +46,7 @@ def confirmPurchase(request):
             'quantity': stock.quantity,
             'brought_prize': stock.brought_prize,
             'buy_time': localtime(stock.buy_time).strftime("%b %d, %Y, %I:%M %p"),
-            'amount': buying_user.amount,
+            'amount': round(buying_user.amount,2),
         }
         return redirect('stockslist:purchaseSuccess')
 
@@ -54,15 +55,20 @@ class Dashboard(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context= super().get_context_data(**kwargs)
         user = UserCreds.objects.get(username=self.request.user.username)
-        context['data'] = user.owned_stocks.all()
-        context['fetchUser'] = user
+        owned = user.owned_stocks.all()
+
+        stock_map = {s.symbol:s.lastPrice for s in Stock.objects.all()}
+        for p in owned:
+            p.last_price = stock_map.get(p.symbol, '0.0')
+        context['data'] = owned
+        context['user'] = user
         return context
 
 
 def purchaseSuccess(request):
     purchase_data = request.session.get('purchase_data', None)
     purchase_data['total_cost'] = purchase_data['brought_prize']*purchase_data['quantity']
-    purchase_data['amount_left'] = get_object_or_404(UserCreds, username=request.user.username).amount
+    purchase_data['amount_left'] = round(get_object_or_404(UserCreds, username=request.user.username).amount,2)
     if not purchase_data:
         return redirect('stockslist:index')
     return render(request, 'stockslist/successBuy.html', context={'data':purchase_data})
@@ -71,13 +77,15 @@ def buy(request):
     try:
         companySymbol = request.POST.get("companySymbol")
         lastPrice = float(request.POST.get("lastPrice"))
+        buyCheck = True if "buy" in request.POST else False
     except:
         request.session['error_message'] = "Cannot fetch data"
         return redirect("stockslist:index")
     print(companySymbol)
     print(lastPrice)
 
-    userBudget = get_object_or_404(UserCreds, username=request.user.username).amount
+    print(buyCheck)
+    userBudget = round(get_object_or_404(UserCreds, username=request.user.username).amount,2)
     context = {'stock':{'symbol':companySymbol, 'lastPrice':lastPrice, 'budget':userBudget}}
 
     maxStockBuy = userBudget//lastPrice
@@ -97,6 +105,25 @@ def stock_data_json(request):
         for s in stocks
     ]
     return JsonResponse(data, safe=False)
+
+def sell(request):
+    try:
+        purchase_id = request.POST.get('id')
+    except Exception as e:
+        return render(request, 'stockslist/dashboard.html', context={'error_message':e})
+    curr_user = UserCreds.objects.get(username=request.user.username)
+    stock_ownership = StockOwnership.objects.filter(id=purchase_id).first()
+    print(stock_ownership)
+    if not stock_ownership:
+        return render(request, 'stockslist/dashboard.html', context={'error_message': "Stock not found"})
+    gainLoss = stock_ownership.profit
+    curr_user.realized_gain += gainLoss
+    curr_user.amount+= gainLoss
+    curr_user.amount+=stock_ownership.brought_prize*stock_ownership.quantity
+    curr_user.unrealized_gain-=gainLoss
+    curr_user.save()
+    stock_ownership.delete()
+    return redirect('stockslist:dashboard')
 def live_profit(request):
     user_ = UserCreds.objects.get(username=request.user)
     purchase = user_.owned_stocks.all()
@@ -106,6 +133,10 @@ def live_profit(request):
             'profit': stock.profit,
             'symbol': stock.symbol,
             'buy_time':stock.buy_time,
+            'brought_prize':stock.brought_prize,
+            'unrealized_gain':user_.unrealized_gain,
+            'quantity':stock.quantity,
+            'lastPrice':Stock.objects.get(symbol=stock.symbol).lastPrice
         }
         for stock in purchase
     ]

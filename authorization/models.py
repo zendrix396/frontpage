@@ -5,6 +5,8 @@ class UserCreds(models.Model):
     username = models.CharField(max_length=20) 
     email = models.EmailField("this is email field")
     amount = models.FloatField(default=1000000.00)
+    realized_gain = models.FloatField(default=0.0)
+    unrealized_gain = models.FloatField(default=0.0)
 
 class StockOwnership(models.Model):
     user = models.ForeignKey("UserCreds",on_delete=models.CASCADE, related_name='owned_stocks')
