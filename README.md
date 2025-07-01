@@ -14,3 +14,4 @@ celery -A frontpage worker --pool=solo -l DEBUG
 # celery beat
 celery -A frontpage beat -l info
 ```
+## UI Inspiration: render or fullstackopen like design
