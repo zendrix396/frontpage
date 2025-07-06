@@ -19,7 +19,8 @@
             <p>Your Budget: ₹{{ stock.budget }}</p>
 
             Share Quantity:
-            <input type="number" id="quantity" name="quantity" min="1" max="{{ stock.maxStockBuy }}">
+            <input type="range" id="quantity" name="quantity" min="1" max="{{stock.maxStockBuy}}" value="1" oninput="quantityValue.value = this.value">
+            <output id="quantityValue">1</output>
             <span>Max Stock you can Buy: {{stock.maxStockBuy}}</span>
             <p>Total Price: ₹<span id="total">0</span></p>
             <input type="hidden" name="lastPrice" value="{{ stock.lastPrice }}">
