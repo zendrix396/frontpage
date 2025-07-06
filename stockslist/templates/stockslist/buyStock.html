@@ -37,7 +37,8 @@
         
         <div class="form-group">
             <label for="quantity">Share Quantity:</label>
-            <input type="number" id="quantity" name="quantity" min="1" max="{{ stock.maxStockBuy }}" class="form-control">
+            <input type="range" id="quantity" name="quantity" min="1" max="{{stock.maxStockBuy}}" value="1" oninput="quantityValue.value = this.value">
+            <output id="quantityValue">1</output>
         </div>
         
         <div class="stock-detail">
