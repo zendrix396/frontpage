@@ -1,4 +1,4 @@
-# TODO
+## TODO
 * buy sell functionality (done ✅) 
 *  celery integration in database (done ✅)
 * unrealized/realized gain (done ✅)
@@ -15,3 +15,5 @@ celery -A frontpage worker --pool=solo -l DEBUG
 # celery beat
 celery -A frontpage beat -l info
 ```
+
+## Next js integration
