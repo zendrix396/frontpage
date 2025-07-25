@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+app_name = 'frontpage'
+
 urlpatterns = [
     path('', include('authorization.urls')),
     path('stock/', include('stockslist.urls')),
