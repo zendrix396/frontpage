@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My App{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav>
+        <!-- Your navbar content -->
+        <ul>
+            <li ><a href="/" class="home">Home</a></li>
+            <li><a href="/login/">Login</a></li>
+            <li><a href="/signup/">Signup</a></li>
+            <li><a href="/dashboard/">Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>
