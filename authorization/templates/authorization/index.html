@@ -1,29 +1,40 @@
-{% load static %}
+{% load static %}  
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FrontPage: Trade without worries!</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-  </head>
-  <body>
-    {% include 'partials/_navbar.html' %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FrontPage: Trade without worries!</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+  {% include 'partials/_navbar.html' %}
 
-    {% if authorized %}
-    <div class="container">
-        <div class="home-image">
-            <img src="{% static 'images/home.svg' %}" alt="home_svg" />
-          </div>
-      <div class="content">
-        <h1 class="heading">Welcome back {{user.username}}!</h1>
-        <h1>Your Amount: {{user.amount}}</h1>
+  <div class="container home-container">
+    <div class="home-content">
+      <div class="home-image">
+        <img src="{% static 'images/home.svg' %}" alt="Trade Illustration" />
       </div>
-     
+
+      <div class="content">
+        {% if authorized %}
+          <h1 class="heading">Welcome back, {{ user.username }} 👋</h1>
+          <h1>Your available balance: ₹{{ user.amount }}</h1>
+          <p>📈 Buy & Sell stocks in real-time, track performance, and manage your portfolio effortlessly.</p>
+          <a class="submit-button" href="{% url 'stockslist:dashboard' %}">Go to Dashboard</a>
+        {% else %}
+          <h1 class="heading">Welcome to <span class="highlight">FrontPage</span> 🧠</h1>
+          <p>
+            Trade seamlessly with live prices, manage your portfolio, and view detailed analytics.  
+            Whether you're a beginner or a pro — FrontPage gives you all the tools to succeed.
+          </p>
+          <p>✅ Real-time buy/sell with optimized backend using Redis & Celery</p>
+          <p>📊 Track unrealized/realized gains, see full transaction history</p>
+          <a class="submit-button" href="{% url 'authorization:login' %}">Login to Get Started</a>
+        {% endif %}
+      </div>
     </div>
-    {% else %}
-    <h1>Login into our amazing app</h1>
-    {% endif %}
-  </body>
+  </div>
+</body>
 </html>

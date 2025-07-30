@@ -1,23 +1,32 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Success!</title>
+    <title>✅ Purchase Successful</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+   
 </head>
 <body>
-    <h2>✅ Purchase Successful!</h2>
-    <p>You have successfully bought:</p>
-    <ul>
-        <li>Symbol: {{ data.symbol }}</li>
-        <li>Quantity: {{ data.quantity }}</li>
-        <li>Buy Price: ₹{{ data.brought_prize }}</li>
-        <li>Buy Time: {{ data.buy_time }}</li>
-        <li>Total Cost: ₹{{ data.total_cost}}</li>
-    </ul>
-
-    <p>Your new balance: ₹{{ data.amount_left }}</p>
-
-    <a href="{% url 'stockslist:index' %}">Go back to Home</a>
+    {% include 'partials/_navbar.html' %}
+    <div class="container">
+        <div class="dashboard-item">
+            <h2>✅ Purchase Successful!</h2>
+            <p>You have successfully bought:</p>
+            <div class="flexcol">
+                <p><strong>Symbol:</strong> {{ data.symbol }}</p>
+                <p><strong>Quantity:</strong> {{ data.quantity }}</p>
+                <p><strong>Buy Price:</strong> ₹{{ data.brought_prize }}</p>
+                <p><strong>Buy Time:</strong> {{ data.buy_time }}</p>
+                <p><strong>Total Cost:</strong> ₹{{ data.total_cost }}</p>
+            </div>
+            <p>Your new balance: ₹{{ data.amount_left }}</p>
+            <a href="{% url 'stockslist:index' %}" class="submit-button">🏠 Go back to Home</a>
+        </div>
+    </div>
 </body>
 </html>

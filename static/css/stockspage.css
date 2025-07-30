@@ -1,0 +1,41 @@
+.forflex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    /* max-width: 1400px; */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.dashboard-item {
+    width: 380px;
+    border: 3px solid #95b5e8;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 10px;
+    background-color: #111;
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(149, 181, 232, 0.2);
+}
+
+.submit-button {
+    background-color: #6495ed;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s ease;
+}
+
+.submit-button:hover {
+    background-color: #3a73c2;
+}

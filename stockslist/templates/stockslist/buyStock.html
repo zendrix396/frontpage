@@ -1,17 +1,26 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Purchase for {{stock.name}}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/stockslist_index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/buyStock.css' %}">
 </head>
 <body>
+    {% include 'partials/_navbar.html' %}
+    <div class="container">
     <form action="{% url 'stockslist:confirmPurchase' %}" method="POST">
         {% csrf_token %}
-        <fieldset>
-            <legend>
+        <div class="dashboard-item">
+            <h1>
                 Stock name: {{ stock.symbol }}
-            </legend>
+            </h1>
             {% if error_message %}
             <p>{{ error_message }}</p>
             {% endif %}
@@ -26,10 +35,10 @@
             <input type="hidden" name="lastPrice" value="{{ stock.lastPrice }}">
             <input type="hidden" name="symbol" value="{{ stock.symbol }}">
 
-            <button type="submit">Buy</button>
-        </fieldset>
+            <button type="submit" class="submit-button">Buy</button>
+        </div>
     </form>
-
+</div>
     <script>
         const price = parseFloat(document.getElementById("price").innerText);
         const quantityInput = document.getElementById("quantity");

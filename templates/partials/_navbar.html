@@ -1,10 +1,10 @@
 <nav class="navbar">
-    <a href="{% url 'authorization:index' %}" class="navbar-brand">PaperTrader</a>
+    <a href="{% url 'authorization:index' %}" class="navbar-brand">FrontPage</a>
     <ul class="nav-links">
         <li class="stocks-button"><a href="{% url 'stockslist:index' %}">Stocks</a></li>
         {% if authorized %}
-            <li><a href="{% url 'stockslist:dashboard' %}" class="dashboard-button">Dashboard</a></li>
-            <li><a href="{% url 'authorization:logout' %}" class="logout-button">Logout</a></li>
+            <li class="dashboard-button"><a href="{% url 'stockslist:dashboard' %}" class="dashboard-button">Dashboard</a></li>
+            <li class="logout-button"><a href="{% url 'authorization:logout' %}" class="logout-button">Logout</a></li>
             {% else %}
             <li class="login-button"><a href="{% url 'authorization:login'%}">Login</a></li>
             {% endif %}

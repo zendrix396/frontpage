@@ -26,7 +26,9 @@
           {% endif %}
       {% if error_message %}
       <p>{{error_message}}</p>
-      {% endif %} {% for purchase in data %}
+      {% endif %} 
+      <div class="forflex">
+      {% for purchase in data %}
       <form action="{% url 'stockslist:sell' %}" method="POST">
         {% csrf_token %}
         <div class="{{purchase.id}} dashboard-item">
@@ -43,6 +45,7 @@
       </form>
 
       {% endfor %}
+      </div>
     </div>
   </body>
   <script>
