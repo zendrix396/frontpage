@@ -8,23 +8,30 @@
     <title>✅ Purchase Successful</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-   
 </head>
 <body>
     {% include 'partials/_navbar.html' %}
     <div class="container">
-        <div class="dashboard-item">
-            <h2>✅ Purchase Successful!</h2>
-            <p>You have successfully bought:</p>
-            <div class="flexcol">
-                <p><strong>Symbol:</strong> {{ data.symbol }}</p>
-                <p><strong>Quantity:</strong> {{ data.quantity }}</p>
-                <p><strong>Buy Price:</strong> ₹{{ data.brought_prize }}</p>
-                <p><strong>Buy Time:</strong> {{ data.buy_time }}</p>
-                <p><strong>Total Cost:</strong> ₹{{ data.total_cost }}</p>
+        <div class="dashboard-item success-card">
+            <div class="success-header">
+                <h2>✅ Purchase Successful!</h2>
+                <p>You have successfully bought:</p>
             </div>
-            <p>Your new balance: ₹{{ data.amount_left }}</p>
+            
+            <div class="purchase-details">
+                <div class="flexcol">
+                    <p><strong>Symbol:</strong> {{ data.symbol }}</p>
+                    <p><strong>Quantity:</strong> {{ data.quantity }}</p>
+                    <p><strong>Buy Price:</strong> ₹{{ data.brought_prize }}</p>
+                    <p><strong>Buy Time:</strong> {{ data.buy_time }}</p>
+                    <p><strong>Total Cost:</strong> ₹{{ data.total_cost }}</p>
+                </div>
+            </div>
+            
+            <div class="balance-info">
+                <p><strong>Your new balance:</strong> ₹{{ data.amount_left }}</p>
+            </div>
+            
             <a href="{% url 'stockslist:index' %}" class="submit-button">🏠 Go back to Home</a>
         </div>
     </div>

@@ -1,79 +1,82 @@
 {% load custom_filters %} {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{user.username}}'s Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
-  </head>
-  <body>
+</head>
+<body>
     {% include "partials/_navbar.html" %}
     <div class="container">   
-      <h1 class="heading">{{user.username}} Dashboard</h1>
-      <p>User Amount: <span class="amount">₹{{user.amount}}</span></p>
-      {% if user.realized_gain > 0 %}
-      <p>Realized Gain: <span class="gain_green">₹{{user.realized_gain}}</span></p>
-      {% else %}
-      <p>Realized Gain:  <span class="gain_red">₹{{user.realized_gain}}</span> </p>
-      {% endif %}
-      {%if user.unrealized_gain > 0 %}
-          <p>Unrealized Gain: <span class="gain_green">₹{{user.unrealized_gain}}</span></p>
-          {% else %}
-          <p>Unrealized Gain: <span class="gain_red">₹{{user.unrealized_gain}}</span></p>
-          {% endif %}
-      {% if error_message %}
-      <p>{{error_message}}</p>
-      {% endif %} 
-      <div class="forflex">
-      {% for purchase in data %}
-      <form action="{% url 'stockslist:sell' %}" method="POST">
-        {% csrf_token %}
-        <div class="{{purchase.id}} dashboard-item">
-          <p>Stock name: {{purchase.symbol}}</p>
-          <p>Quantity: {{purchase.quantity}}</p>
-          <p>Bought Prize: {{purchase.brought_prize}}</p>
-          <p class="lastPrice">Last Prize: {{purchase.last_price}}</p>
-          <p class="profit">
-            Profit/Loss: {{purchase.quantity|multiply:purchase.profit}}
-          </p>
-          <input type="hidden" name="id" value="{{purchase.id}}" />
-          <input type="submit" value="Sell" class="submit-button" />
+        <div class="dashboard-header">
+            <h1 class="heading">{{user.username}}'s Dashboard</h1>
+            <div class="user-stats">
+                <p>User Amount: <span class="amount">₹{{user.amount}}</span></p>
+                {% if user.realized_gain > 0 %}
+                <p>Realized Gain: <span class="gain_green">₹{{user.realized_gain}}</span></p>
+                {% else %}
+                <p>Realized Gain: <span class="gain_red">₹{{user.realized_gain}}</span></p>
+                {% endif %}
+                {%if user.unrealized_gain > 0 %}
+                <p>Unrealized Gain: <span class="gain_green">₹{{user.unrealized_gain}}</span></p>
+                {% else %}
+                <p>Unrealized Gain: <span class="gain_red">₹{{user.unrealized_gain}}</span></p>
+                {% endif %}
+            </div>
         </div>
-      </form>
-
-      {% endfor %}
-      </div>
+        
+        {% if error_message %}
+        <p class="error_message">{{error_message}}</p>
+        {% endif %} 
+        
+        <div class="forflex">
+            {% for purchase in data %}
+            <form action="{% url 'stockslist:sell' %}" method="POST">
+                {% csrf_token %}
+                <div class="{{purchase.id}} dashboard-item">
+                    <div class="stock-header">
+                        <h3>{{purchase.symbol}}</h3>
+                    </div>
+                    
+                    <div class="stock-details">
+                        <p><strong>Quantity:</strong> {{purchase.quantity}}</p>
+                        <p><strong>Bought Price:</strong> ₹{{purchase.brought_prize}}</p>
+                        <p class="lastPrice"><strong>Last Price:</strong> ₹{{purchase.last_price}}</p>
+                        <p class="profit"><strong>Profit/Loss:</strong> ₹{{purchase.quantity|multiply:purchase.profit}}</p>
+                    </div>
+                    
+                    <input type="hidden" name="id" value="{{purchase.id}}" />
+                    <input type="submit" value="Sell Stock" class="submit-button" />
+                </div>
+            </form>
+            {% endfor %}
+        </div>
     </div>
-  </body>
-  <script>
-    async function fetchLiveData() {
-      try {
-        const response = await fetch("{% url 'stockslist:live_profit' %}");
-        const data = await response.json();
-        data.forEach((stock) => {
-          const fieldset = document.querySelector(`.${stock.id}`);
-          if (fieldset) {
-            fieldset.querySelector(
-              ".profit"
-            ).textContent = `Profit/Loss: ${stock.profit.toFixed(2)}`;
-            fieldset.querySelector(
-              ".lastPrice"
-            ).textContent = `Last Prize: ${stock.lastPrice.toFixed(2)}`;
-          }
-          document.querySelector(
-            ".unrealized_gain"
-          ).textContent = `Unrealized Gain: ${stock.unrealized_gain}`;
+    
+    <script>
+        async function fetchLiveData() {
+            try {
+                const response = await fetch("{% url 'stockslist:live_profit' %}");
+                const data = await response.json();
+                data.forEach((stock) => {
+                    const fieldset = document.querySelector(`.${stock.id}`);
+                    if (fieldset) {
+                        fieldset.querySelector(".profit").innerHTML = `<strong>Profit/Loss:</strong> ₹${stock.profit.toFixed(2)}`;
+                        fieldset.querySelector(".lastPrice").innerHTML = `<strong>Last Price:</strong> ₹${stock.lastPrice.toFixed(2)}`;
+                    }
+                });
+            } catch (error) {
+                console.error("Live update error: ", error);
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchLiveData();
+            setInterval(fetchLiveData, 2200);
         });
-      } catch (error) {
-        console.error("Live update error: ", error);
-      }
-    }
-    document.addEventListener("DOMContentLoaded", () => {
-      fetchLiveData();
-      setInterval(fetchLiveData, 2200);
-    });
-  </script>
+    </script>
+</body>
 </html>

@@ -7,48 +7,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Purchase for {{stock.name}}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/stockslist_index.css' %}">
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'css/buyStock.css' %}">
 </head>
 <body>
     {% include 'partials/_navbar.html' %}
     <div class="container">
-    <form action="{% url 'stockslist:confirmPurchase' %}" method="POST">
-        {% csrf_token %}
-        <div class="dashboard-item">
-            <h1>
-                Stock name: {{ stock.symbol }}
-            </h1>
+        <form action="{% url 'stockslist:confirmPurchase' %}" method="POST" class="buy-form">
+            {% csrf_token %}
+            <h2>Purchase {{ stock.symbol }}</h2>
             {% if error_message %}
-            <p>{{ error_message }}</p>
+            <p class="error_message">{{ error_message }}</p>
             {% endif %}
-            <p>Buying Price: ₹<span id="price">{{ stock.lastPrice }}</span></p>
-            <p>Your Budget: ₹{{ stock.budget }}</p>
+            
+            <div class="stock-info">
+                <p><strong>Buying Price:</strong> ₹<span id="price">{{ stock.lastPrice }}</span></p>
+                <p><strong>Your Budget:</strong> ₹{{ stock.budget }}</p>
+                <p><strong>Max Shares:</strong> {{stock.maxStockBuy}}</p>
+            </div>
 
-            Share Quantity:
-            <input type="range" id="quantity" name="quantity" min="1" max="{{stock.maxStockBuy}}" value="1" oninput="quantityValue.value = this.value">
-            <output id="quantityValue">1</output>
-            <span>Max Stock you can Buy: {{stock.maxStockBuy}}</span>
-            <p>Total Price: ₹<span id="total">0</span></p>
+            <div class="quantity-section">
+                <label for="quantity">Share Quantity:</label>
+                <div class="range-container">
+                    <input type="range" id="quantity" name="quantity" min="1" max="{{stock.maxStockBuy}}" value="1" oninput="quantityValue.value = this.value">
+                    <output id="quantityValue">1</output>
+                </div>
+            </div>
+
+            <div class="total-section">
+                <p><strong>Total Price:</strong> ₹<span id="total">0</span></p>
+            </div>
+
             <input type="hidden" name="lastPrice" value="{{ stock.lastPrice }}">
             <input type="hidden" name="symbol" value="{{ stock.symbol }}">
 
-            <button type="submit" class="submit-button">Buy</button>
-        </div>
-    </form>
-</div>
+            <button type="submit" class="submit-button">Confirm Purchase</button>
+        </form>
+    </div>
+    
     <script>
         const price = parseFloat(document.getElementById("price").innerText);
         const quantityInput = document.getElementById("quantity");
         const totalDisplay = document.getElementById("total");
 
-        quantityInput.addEventListener("input", function () {
+        function updateTotal() {
             const quantity = parseInt(quantityInput.value) || 0;
             const total = (price * quantity).toFixed(2);
             totalDisplay.innerText = total;
-        });
+        }
+
+        quantityInput.addEventListener("input", updateTotal);
+        updateTotal(); // Initialize total
     </script>
 </body>
 </html>

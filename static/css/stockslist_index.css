@@ -1,3 +1,9 @@
-.stocks-button a{
+.stocks-button a {
     color: #95b5e8;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.stocks-button a:hover {
+    color: #7a9fd8;
 }

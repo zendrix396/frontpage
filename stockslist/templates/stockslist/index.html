@@ -7,62 +7,66 @@
     <title>Stocks</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/stockslist_index.css' %}">
-    <!-- <link rel="stylesheet" href="{% static 'css/login.css' %}"> -->
     <link rel="stylesheet" href="{% static 'css/stockspage.css' %}">
 </head>
 <body>
     {% include 'partials/_navbar.html' %}
     <div class="forflex">
-    {% for company in data %}
-    <form action="{% url 'stockslist:buy' %}" method="POST">
-        {% csrf_token %}
-<div style="text-align: center;" class="dashboard-item {{ company.symbol }}">
-                <h3>{{ company.name }} ({{ company.symbol }})</h3>
-            <p class="dayHigh">Day High: ₹{{ company.dayHigh }}</p>
-            <p class="dayLow">Day Low: ₹{{ company.dayLow }}</p>
-            <p class="lastPrice">Last Price: ₹{{ company.lastPrice }}</p>
-            <p class="pChange">Change: {{ company.pChange }}%</p>
+        {% for company in data %}
+        <form action="{% url 'stockslist:buy' %}" method="POST">
+            {% csrf_token %}
+            <div class="dashboard-item {{ company.symbol }}">
+                <div class="stock-header">
+                    <h3>{{ company.name }} ({{ company.symbol }})</h3>
+                </div>
+                
+                <div class="stock-details">
+                    <p class="dayHigh">Day High: ₹{{ company.dayHigh }}</p>
+                    <p class="dayLow">Day Low: ₹{{ company.dayLow }}</p>
+                    <p class="lastPrice">Last Price: ₹{{ company.lastPrice }}</p>
+                    <p class="pChange">Change: {{ company.pChange }}%</p>
+                </div>
 
-            <input type="hidden" name="companySymbol" value="{{ company.symbol }}">
-            <input type="hidden" name="lastPrice" class="priceInput" value="{{ company.lastPrice }}">
+                <input type="hidden" name="companySymbol" value="{{ company.symbol }}">
+                <input type="hidden" name="lastPrice" class="priceInput" value="{{ company.lastPrice }}">
 
-            {% if fetchUser %}
-                <button type="submit" name="buy" value="Buy" class="submit-button">Buy</button>
-            {% else %}
-                <button type="submit" name="buy" value="Buy" disabled class="submit-button">Buy</button>
-            {% endif %}
-        </div>
-    </form>
-    {% endfor %}
+                {% if fetchUser %}
+                    <button type="submit" name="buy" value="Buy" class="submit-button">Buy Stock</button>
+                {% else %}
+                    <button type="submit" name="buy" value="Buy" disabled class="submit-button">Login to Buy</button>
+                {% endif %}
+            </div>
+        </form>
+        {% endfor %}
     </div>
-</body>
 
-<script>
-    async function fetchLiveData() {
-        try {
-            const response = await fetch("{% url 'stockslist:live_api' %}");
-            const data = await response.json();
+    <script>
+        async function fetchLiveData() {
+            try {
+                const response = await fetch("{% url 'stockslist:live_api' %}");
+                const data = await response.json();
 
-            data.forEach(stock => {
-                const fieldset = document.querySelector(`."${stock.symbol}"]`);
-                if (fieldset) {
-                    fieldset.querySelector('.dayHigh').textContent = `Day High: ₹${stock.dayHigh}`;
-                    fieldset.querySelector('.dayLow').textContent = `Day Low: ₹${stock.dayLow}`;
-                    fieldset.querySelector('.lastPrice').textContent = `Last Price: ₹${stock.lastPrice}`;
-                    fieldset.querySelector('.pChange').textContent = `Change: ${stock.pChange}%`;
+                data.forEach(stock => {
+                    const fieldset = document.querySelector(`.${stock.symbol}`);
+                    if (fieldset) {
+                        fieldset.querySelector('.dayHigh').textContent = `Day High: ₹${stock.dayHigh}`;
+                        fieldset.querySelector('.dayLow').textContent = `Day Low: ₹${stock.dayLow}`;
+                        fieldset.querySelector('.lastPrice').textContent = `Last Price: ₹${stock.lastPrice}`;
+                        fieldset.querySelector('.pChange').textContent = `Change: ${stock.pChange}%`;
 
-                    const input = fieldset.querySelector('.priceInput');
-                    if (input) input.value = stock.lastPrice;
-                }
-            });
-        } catch (error) {
-            console.error("Live update error:", error);
+                        const input = fieldset.querySelector('.priceInput');
+                        if (input) input.value = stock.lastPrice;
+                    }
+                });
+            } catch (error) {
+                console.error("Live update error:", error);
+            }
         }
-    }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        fetchLiveData();  
-        setInterval(fetchLiveData, 3000); 
-    });
-</script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchLiveData();  
+            setInterval(fetchLiveData, 3000); 
+        });
+    </script>
+</body>
 </html>
