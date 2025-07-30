@@ -1,12 +1,18 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stocks</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/stockslist_index.css' %}">
 </head>
 <body>
+    {% include 'partials/_navbar.html' %}
+    {% if authorized %}
     <a href="{% url 'stockslist:dashboard' %}">Dashboard</a>
+    {% endif %}
     {% for company in data %}
     <form action="{% url 'stockslist:buy' %}" method="POST">
         {% csrf_token %}

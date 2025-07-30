@@ -68,13 +68,14 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'authorization.context_preprocessors.auth_status',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'frontpage.wsgi.application'
-
+LOGIN_URL = "/auth/login"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -122,7 +123,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_ROOT = BASE_DIR / 'staticfiles_collected' # Ensure this line exists and is correct
 
 STATIC_URL = 'static/'
 

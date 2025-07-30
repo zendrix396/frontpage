@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout
 from .models import UserCreds
 from django.http import HttpResponseRedirect
 from django.views import generic
@@ -34,6 +34,7 @@ class LoginPage(TemplateView):
         error_message = self.request.session.pop('error_message', None)
         if error_message:
             context['error_message'] = error_message
+
         return context
 
 def loginCheck(request):
@@ -123,3 +124,7 @@ def verifyOTP(request):
     if user:
         login(request, user)
         return redirect("authorization:index")
+    
+def logout_view(request):
+    logout(request)
+    return redirect('authorization:login')

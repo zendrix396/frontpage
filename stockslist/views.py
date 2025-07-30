@@ -8,6 +8,8 @@ from django.utils.timezone import localtime
 from django.db.models import F
 from authorization.models import UserCreds, StockOwnership
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 class Index(TemplateView):
     template_name = 'stockslist/index.html'
@@ -49,7 +51,7 @@ def confirmPurchase(request):
             'amount': round(buying_user.amount,2),
         }
         return redirect('stockslist:purchaseSuccess')
-
+@method_decorator(login_required, name='dispatch')
 class Dashboard(generic.TemplateView):
     template_name = 'stockslist/dashboard.html'
     def get_context_data(self, **kwargs):

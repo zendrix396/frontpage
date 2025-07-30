@@ -1,0 +1,13 @@
+.home-image img{
+    width: 500px;
+    height: 500px;
+}
+.container{
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 200px;
+}
+.content{
+    display: flex;
+    justify-content: center;
+}

@@ -1,0 +1,60 @@
+.container{
+    height: 80vh;
+    width: 1366px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    /* flex-direction: column; */
+    /* gap: 100px; */
+}
+.login-button a{
+    color: #95b5e8;
+}
+.login_svg{
+    width: 550px;
+    height: 550px;
+    animation: move 3s infinite ease alternate;
+}
+
+h1{
+    color: #95b5e8;
+}
+.login-container{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+@keyframes move{
+    from {
+        transform: translateY(-15px);
+   } to{
+    transform: translateY(0px) scale(1.02);
+   }
+}
+.submit-button{
+    padding: 10px 15px;
+    font-size: 18px;
+    color: white;
+    background-color: #6f9de7;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+}
+.submit-button:hover{
+    background-color: #588fe8;
+}
+.input{
+    padding: 10px 15px;
+    font-size: 18px;
+    background: transparent;
+    border: 2px solid #999;
+    border-radius: 3px;
+    color: white;
+}
+.error_message{
+    color: #e76f6f;
+}

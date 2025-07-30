@@ -1,15 +1,16 @@
 /* static/css/styles.css */
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     margin: 0;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #111;
+    color: #999;
+
 }
 
 .navbar {
-    background-color: #333;
-    color: white;
+    
+    color: #999;
     padding: 1em 2em;
     display: flex;
     justify-content: space-between;
@@ -19,8 +20,9 @@ body {
 .navbar-brand {
     font-size: 1.5em;
     font-weight: bold;
-    color: white;
+    /* color: white; */
     text-decoration: none;
+    color: #95b5e8;
 }
 
 .nav-links {
@@ -30,27 +32,24 @@ body {
     display: flex;
 }
 
+
 .nav-links li {
     margin-left: 20px;
 }
 
 .nav-links a {
-    color: white;
+    color: #999;
     text-decoration: none;
     padding: 0.5em 1em;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
+    transition: 0.3s ease;
 }
-
-.nav-links a:hover {
-    background-color: #555;
+.nav-links a:hover{
+    color: #95b5e8;
 }
 
 .container {
-    max-width: 960px;
+    max-width: 1336px;
     margin: 20px auto;
     padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
