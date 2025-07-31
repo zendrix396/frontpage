@@ -10,6 +10,19 @@
 </head>
 <body>
     {% include "partials/_navbar.html" %}
+    
+    <div class="market-status-banner {% if market_status.is_open %}market-open{% else %}market-closed{% endif %}">
+        <div class="market-status-content">
+            <span class="market-status-icon">{% if market_status.is_open %}🟢{% else %}🔴{% endif %}</span>
+            <span class="market-status-text">{{ market_status.message }}</span>
+            {% if market_status.is_open %}
+                <span class="market-status-time">{{ market_status.next_close }}</span>
+            {% else %}
+                <span class="market-status-time">{{ market_status.next_open }}</span>
+            {% endif %}
+        </div>
+    </div>
+    
     <div class="container">   
         <div class="dashboard-header">
             <h1 class="heading">{{user.username}}'s Dashboard</h1>
@@ -49,7 +62,11 @@
                     </div>
                     
                     <input type="hidden" name="id" value="{{purchase.id}}" />
-                    <input type="submit" value="Sell Stock" class="submit-button" />
+                    {% if market_status.is_open %}
+                        <input type="submit" value="Sell Stock" class="submit-button" />
+                    {% else %}
+                        <input type="submit" value="Market Closed" class="submit-button disabled" disabled />
+                    {% endif %}
                 </div>
             </form>
             {% endfor %}

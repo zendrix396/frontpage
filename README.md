@@ -16,4 +16,10 @@ celery -A frontpage worker --pool=solo -l DEBUG
 celery -A frontpage beat -l info
 ```
 
-## Next js integration
+## FUTURE Expansion
+* optimize the real time functionality to scale it for a larger users pool (current realtime fetching is pretty shitty)
+* add the ai [[ML]] bot that will have it's own portfolio (publically available) along with previous history of trading (keep enhancing it such that it outperforms and do well)
+
+
+> Add limited time block (for prod)=> where the market is open (9:15 to 3:30) monday to friday 
+done ✅

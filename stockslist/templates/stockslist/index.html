@@ -11,6 +11,19 @@
 </head>
 <body>
     {% include 'partials/_navbar.html' %}
+    
+    <div class="market-status-banner {% if market_status.is_open %}market-open{% else %}market-closed{% endif %}">
+        <div class="market-status-content">
+            <span class="market-status-icon">{% if market_status.is_open %}🟢{% else %}🔴{% endif %}</span>
+            <span class="market-status-text">{{ market_status.message }}</span>
+            {% if market_status.is_open %}
+                <span class="market-status-time">{{ market_status.next_close }}</span>
+            {% else %}
+                <span class="market-status-time">{{ market_status.next_open }}</span>
+            {% endif %}
+        </div>
+    </div>
+
     <div class="forflex">
         {% for company in data %}
         <form action="{% url 'stockslist:buy' %}" method="POST">
@@ -30,8 +43,10 @@
                 <input type="hidden" name="companySymbol" value="{{ company.symbol }}">
                 <input type="hidden" name="lastPrice" class="priceInput" value="{{ company.lastPrice }}">
 
-                {% if fetchUser %}
+                {% if fetchUser and market_status.is_open %}
                     <button type="submit" name="buy" value="Buy" class="submit-button">Buy Stock</button>
+                {% elif fetchUser and not market_status.is_open %}
+                    <button type="submit" name="buy" value="Buy" disabled class="submit-button disabled">Market Closed</button>
                 {% else %}
                     <button type="submit" name="buy" value="Buy" disabled class="submit-button">Login to Buy</button>
                 {% endif %}

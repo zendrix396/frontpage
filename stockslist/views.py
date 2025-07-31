@@ -10,6 +10,15 @@ from authorization.models import UserCreds, StockOwnership
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from .utils import is_market_open, get_market_status
+from django.http import HttpResponseForbidden
+
+def market_hours_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not is_market_open():
+            return HttpResponseForbidden("Trading is only allowed during market hours (9:15 AM - 3:30 PM IST, Monday to Friday)")
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 class Index(TemplateView):
     template_name = 'stockslist/index.html'
@@ -17,9 +26,11 @@ class Index(TemplateView):
         context= super().get_context_data(**kwargs)
         context['data'] = Stock.objects.all()
         context['fetchUser'] = self.request.user if self.request.user.is_authenticated else None
+        context['market_status'] = get_market_status()
         return context
 
 @login_required
+@market_hours_required
 def confirmPurchase(request):
     try:
         symbol = request.POST.get("symbol")
@@ -67,18 +78,21 @@ class Dashboard(generic.TemplateView):
             p.last_price = stock_map.get(p.symbol, '0.0')
         context['data'] = owned
         context['user'] = user
+        context['market_status'] = get_market_status()
         return context
 
 @login_required
 def purchaseSuccess(request):
     purchase_data = request.session.get('purchase_data', None)
-    purchase_data['total_cost'] = purchase_data['brought_prize']*purchase_data['quantity']
-    purchase_data['amount_left'] = round(get_object_or_404(UserCreds, username=request.user.username).amount,2)
     if not purchase_data:
         return redirect('stockslist:index')
+    
+    purchase_data['total_cost'] = purchase_data['brought_prize']*purchase_data['quantity']
+    purchase_data['amount_left'] = round(get_object_or_404(UserCreds, username=request.user.username).amount,2)
     return render(request, 'stockslist/successBuy.html', context={'data':purchase_data})
 
 @login_required
+@market_hours_required
 def buy(request):
     try:
         companySymbol = request.POST.get("companySymbol")
@@ -114,6 +128,7 @@ def stock_data_json(request):
     return JsonResponse(data, safe=False)
 
 @login_required
+@market_hours_required
 def sell(request):
     try:
         purchase_id = request.POST.get('id')
