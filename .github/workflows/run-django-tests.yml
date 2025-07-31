@@ -3,11 +3,11 @@ name: Run Django Tests
 on:
   push: 
     branches: ["*"]
-  pull:
+  pull_request:
     branches: ["*"]
 
 jobs:
-  setup-environment:
+  run-tests:
     runs-on: ubuntu-latest
     steps:
     - name: Run tests

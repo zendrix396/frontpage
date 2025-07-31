@@ -7,7 +7,7 @@ on:
     branches: ["*"]
 
 jobs:
-  setup-environment:
+  migrate-database:
     runs-on: ubuntu-latest
 
     steps:
