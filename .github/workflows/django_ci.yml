@@ -8,15 +8,14 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
+  VENV_DIR: ".venv"
 
-# Cache key helper for pip
-# You could also include a hash of requirements.txt for stricter invalidation.
 jobs:
   setup:
-    name: Setup & install deps (shared cache)
+    name: Setup and cache venv
     runs-on: ubuntu-latest
     outputs:
-      cache-hit: ${{ steps.cache-pip.outputs.cache-hit }}
+      venv-key: ${{ steps.venv-cache.outputs.cache-primary-key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,45 +25,40 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Cache pip
-        id: cache-pip
+      - name: Cache full virtual environment
+        id: venv-cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: pip-cache-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            pip-cache-${{ runner.os }}-
+          path: ${{ env.VENV_DIR }}
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
 
-      - name: Install dependencies
+      - name: Create and install into venv (if not cached)
+        if: steps.venv-cache.outputs.cache-hit != 'true'
         run: |
+          python -m venv ${{ env.VENV_DIR }}
+          source ${{ env.VENV_DIR }}/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install flake8 coverage  # all jobs will use this
 
   lint:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3  # cheap, required to get sources
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Restore pip cache
+      - name: Restore venv from cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: pip-cache-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            pip-cache-${{ runner.os }}-
-
-      - name: Install lint tool
-        run: pip install flake8
+          path: ${{ env.VENV_DIR }}
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
 
       - name: Run flake8
         run: |
+          source ${{ env.VENV_DIR }}/bin/activate
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
@@ -72,29 +66,20 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Restore pip cache
+      - name: Restore venv from cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: pip-cache-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            pip-cache-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          path: ${{ env.VENV_DIR }}
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
 
       - name: Run migrations
         run: |
+          source ${{ env.VENV_DIR }}/bin/activate
           python manage.py makemigrations --noinput
           python manage.py migrate --noinput
 
@@ -102,32 +87,22 @@ jobs:
     needs: migrate
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Restore pip cache
+      - name: Restore venv from cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
-          key: pip-cache-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            pip-cache-${{ runner.os }}-
-
-      - name: Install dependencies & coverage
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install coverage
+          path: ${{ env.VENV_DIR }}
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
 
       - name: Run tests with coverage
         env:
           DJANGO_SECRET_KEY: "dummy-test-secret"
         run: |
+          source ${{ env.VENV_DIR }}/bin/activate
           coverage run manage.py test
           coverage report --fail-under=80
           coverage xml
@@ -143,4 +118,5 @@ jobs:
         if: always()
         run: |
           echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+          source ${{ env.VENV_DIR }}/bin/activate
           coverage report >> $GITHUB_STEP_SUMMARY
