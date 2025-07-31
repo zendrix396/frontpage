@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn frontpage.wsgi
+web: python manage.py migrate && uvicorn frontpage.asgi:application
