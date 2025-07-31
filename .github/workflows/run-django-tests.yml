@@ -1,0 +1,17 @@
+name: Run Django Tests 
+
+on:
+  push: 
+    branches: ["*"]
+  pull:
+    branches: ["*"]
+
+jobs:
+  setup-environment:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run tests
+      env: 
+        CI: true
+      run: python manage.py test
+  

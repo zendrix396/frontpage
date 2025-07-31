@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from .models import Stock
 from authorization.models import StockOwnership, UserCreds
+from django.utils import timezone
 
 class StockslistTests(TestCase):
     def setUp(self):
@@ -80,3 +81,58 @@ class StockslistTests(TestCase):
             'quantity': 1
         })
         self.assertIn(response.status_code, [200, 400, 403])
+
+    def test_portfolio_breakdown(self):
+        # Create multiple stocks and ownerships
+        stock2 = Stock.objects.create(symbol='GOOG', name='Google', lastPrice=200, dayHigh=210, dayLow=190, pChange=0)
+        StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=2, brought_prize=100, profit=10)
+        StockOwnership.objects.create(user=self.user_creds, symbol='GOOG', quantity=1, brought_prize=200, profit=20)
+        self.client.login(username='trader', password='tradepass')
+        response = self.client.get(self.dashboard_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'AAPL')
+        self.assertContains(response, 'GOOG')
+        self.assertContains(response, 'Dashboard')
+
+    def test_profit_loss_calculation(self):
+        # Simulate a buy and sell, check realized/unrealized gain
+        so = StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=2, brought_prize=100, profit=15)
+        self.user_creds.unrealized_gain = 15
+        self.user_creds.save()
+        self.client.login(username='trader', password='tradepass')
+        # Sell the stock
+        response = self.client.post(self.sell_url, {'id': so.id}, follow=True)
+        self.user_creds.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.user_creds.unrealized_gain, 0)
+        self.assertEqual(self.user_creds.realized_gain, 15)
+
+    def test_transaction_history(self):
+        # Simulate multiple buys and check dashboard data
+        StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=1, brought_prize=100, profit=5, buy_time=timezone.now())
+        StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=2, brought_prize=110, profit=10, buy_time=timezone.now())
+        self.client.login(username='trader', password='tradepass')
+        response = self.client.get(self.dashboard_url)
+        self.assertEqual(response.status_code, 200)
+        # Check that both transactions are present
+        self.assertContains(response, 'AAPL')
+        self.assertContains(response, '100')
+        self.assertContains(response, '110')
+
+    def test_live_profit_api(self):
+        # Test the live_profit endpoint returns correct structure
+        StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=1, brought_prize=100, profit=5)
+        self.user_creds.unrealized_gain = 5
+        self.user_creds.realized_gain = 0
+        self.user_creds.amount = 999900
+        self.user_creds.save()
+        self.client.login(username='trader', password='tradepass')
+        live_profit_url = reverse('stockslist:live_profit')
+        response = self.client.get(live_profit_url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn('data', data)
+        self.assertIn('userConfig', data)
+        self.assertEqual(data['userConfig']['unrealized_gain'], 5)
+        self.assertEqual(data['userConfig']['realized_gain'], 0)
+        self.assertEqual(data['userConfig']['amount'], 999900)
