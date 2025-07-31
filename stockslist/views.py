@@ -18,6 +18,8 @@ class Index(TemplateView):
         context['data'] = Stock.objects.all()
         context['fetchUser'] = self.request.user if self.request.user.is_authenticated else None
         return context
+
+@login_required
 def confirmPurchase(request):
     try:
         symbol = request.POST.get("symbol")
@@ -51,6 +53,7 @@ def confirmPurchase(request):
             'amount': round(buying_user.amount,2),
         }
         return redirect('stockslist:purchaseSuccess')
+
 @method_decorator(login_required, name='dispatch')
 class Dashboard(generic.TemplateView):
     template_name = 'stockslist/dashboard.html'
@@ -66,6 +69,7 @@ class Dashboard(generic.TemplateView):
         context['user'] = user
         return context
 
+@login_required
 def purchaseSuccess(request):
     purchase_data = request.session.get('purchase_data', None)
     purchase_data['total_cost'] = purchase_data['brought_prize']*purchase_data['quantity']
@@ -74,6 +78,7 @@ def purchaseSuccess(request):
         return redirect('stockslist:index')
     return render(request, 'stockslist/successBuy.html', context={'data':purchase_data})
 
+@login_required
 def buy(request):
     try:
         companySymbol = request.POST.get("companySymbol")
@@ -92,6 +97,7 @@ def buy(request):
         maxStockBuy = userBudget//lastPrice
         context['stock']['maxStockBuy'] = int(maxStockBuy)
         return render(request, "stockslist/buyStock.html", context=context)
+
 def stock_data_json(request):
     stocks = Stock.objects.all()
     data = [
@@ -107,6 +113,7 @@ def stock_data_json(request):
     ]
     return JsonResponse(data, safe=False)
 
+@login_required
 def sell(request):
     try:
         purchase_id = request.POST.get('id')
@@ -125,6 +132,8 @@ def sell(request):
     curr_user.save()
     stock_ownership.delete()
     return redirect('stockslist:dashboard')
+
+@login_required
 def live_profit(request):
     user_ = UserCreds.objects.get(username=request.user)
     purchase = user_.owned_stocks.all()
@@ -142,9 +151,9 @@ def live_profit(request):
         for stock in purchase
     ]
     userConfig = {
-            'unrealized_gain':user_.unrealized_gain,
-            'realized_gain':user_.realized_gain,
-            'amount':user_.amount,
+            'unrealized_gain':round(user_.unrealized_gain,2),
+            'realized_gain':round(user_.realized_gain,2),
+            'amount':round(user_.amount,2),
         }
     
     return JsonResponse({"data":data, "userConfig":userConfig}, safe=False)

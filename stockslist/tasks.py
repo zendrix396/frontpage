@@ -5,9 +5,15 @@ from authorization.models import StockOwnership, UserCreds
 from decimal import Decimal, ROUND_HALF_UP
 import numpy as np
 from collections import defaultdict
+import os
+
 
 @shared_task
 def fetch_stock_data():
+    if os.environ.get("CI") == 'true':
+        print("Skipping live fetch during CI...")
+        return
+
     print("Fetching stock data...")
     # for stock in Stock.objects.all():
     #     if not stock.base_price:

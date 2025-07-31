@@ -71,6 +71,10 @@
     display: inline-block;
     text-align: center;
 }
+.button-views{
+    display: flex;
+    gap: 30px;
+}
 
 .submit-button:hover {
     background-color: #3a73c2;
@@ -126,5 +130,9 @@
     .submit-button {
         padding: 0.75rem 1.25rem;
         font-size: 0.9rem;
+    }
+    .button-views{
+        flex-direction: column;
+        gap: 10px;
     }
 }

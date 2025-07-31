@@ -22,7 +22,10 @@
           <h1 class="heading">Welcome back, {{ user.username }} 👋</h1>
           <h1>Your available balance: ₹{{ user.amount }}</h1>
           <p>📈 Buy & Sell stocks in real-time, track performance, and manage your portfolio effortlessly.</p>
+          <div class="button-views">
           <a class="submit-button" href="{% url 'stockslist:dashboard' %}">Go to Dashboard</a>
+          <a class="submit-button" href="{% url 'stockslist:index' %}">View Live Stocks</a>
+          </div>
         {% else %}
           <h1 class="heading">Welcome to <span class="highlight">FrontPage</span> 🧠</h1>
           <p>
@@ -31,7 +34,10 @@
           </p>
           <p>✅ Real-time buy/sell with optimized backend using Redis & Celery</p>
           <p>📊 Track unrealized/realized gains, see full transaction history</p>
+          <div class="button-views">
           <a class="submit-button" href="{% url 'authorization:login' %}">Login to Get Started</a>
+          <a class="submit-button" href="{% url 'stockslist:index' %}">View Live Stocks</a>
+          </div>
         {% endif %}
       </div>
     </div>
