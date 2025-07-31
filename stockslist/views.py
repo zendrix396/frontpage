@@ -135,10 +135,16 @@ def live_profit(request):
             'symbol': stock.symbol,
             'buy_time':stock.buy_time,
             'brought_prize':stock.brought_prize,
-            'unrealized_gain':user_.unrealized_gain,
+            
             'quantity':stock.quantity,
             'lastPrice':Stock.objects.get(symbol=stock.symbol).lastPrice
         }
         for stock in purchase
     ]
-    return JsonResponse(data, safe=False)
+    userConfig = {
+            'unrealized_gain':user_.unrealized_gain,
+            'realized_gain':user_.realized_gain,
+            'amount':user_.amount,
+        }
+    
+    return JsonResponse({"data":data, "userConfig":userConfig}, safe=False)

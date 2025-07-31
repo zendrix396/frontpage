@@ -15,7 +15,7 @@
         {% for company in data %}
         <form action="{% url 'stockslist:buy' %}" method="POST">
             {% csrf_token %}
-            <div class="dashboard-item {{ company.symbol }}">
+            <div class="dashboard-item sym-{{ company.symbol }}">
                 <div class="stock-header">
                     <h3>{{ company.name }} ({{ company.symbol }})</h3>
                 </div>
@@ -47,7 +47,7 @@
                 const data = await response.json();
 
                 data.forEach(stock => {
-                    const fieldset = document.querySelector(`.${stock.symbol}`);
+                    const fieldset = document.querySelector(`.sym-${CSS.escape(stock.symbol)}`);
                     if (fieldset) {
                         fieldset.querySelector('.dayHigh').textContent = `Day High: ₹${stock.dayHigh}`;
                         fieldset.querySelector('.dayLow').textContent = `Day Low: ₹${stock.dayLow}`;

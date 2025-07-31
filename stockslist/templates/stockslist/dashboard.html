@@ -16,14 +16,14 @@
             <div class="user-stats">
                 <p>User Amount: <span class="amount">₹{{user.amount}}</span></p>
                 {% if user.realized_gain > 0 %}
-                <p>Realized Gain: <span class="gain_green">₹{{user.realized_gain}}</span></p>
+                <p>Realized Gain: <span class="gain_green realized_gain">₹{{user.realized_gain}}</span></p>
                 {% else %}
-                <p>Realized Gain: <span class="gain_red">₹{{user.realized_gain}}</span></p>
+                <p>Realized Gain: <span class="gain_red realized_gain">₹{{user.realized_gain}}</span></p>
                 {% endif %}
                 {%if user.unrealized_gain > 0 %}
-                <p>Unrealized Gain: <span class="gain_green">₹{{user.unrealized_gain}}</span></p>
+                <p>Unrealized Gain: <span class="gain_green unrealized_gain">₹{{user.unrealized_gain}}</span></p>
                 {% else %}
-                <p>Unrealized Gain: <span class="gain_red">₹{{user.unrealized_gain}}</span></p>
+                <p>Unrealized Gain: <span class="gain_red unrealized_gain">₹{{user.unrealized_gain}}</span></p>
                 {% endif %}
             </div>
         </div>
@@ -41,7 +41,7 @@
                         <h3>{{purchase.symbol}}</h3>
                     </div>
                     
-                    <div class="stock-details">
+                    <div class="stock-details purchase-{{purchase.id}}">
                         <p><strong>Quantity:</strong> {{purchase.quantity}}</p>
                         <p><strong>Bought Price:</strong> ₹{{purchase.brought_prize}}</p>
                         <p class="lastPrice"><strong>Last Price:</strong> ₹{{purchase.last_price}}</p>
@@ -61,13 +61,21 @@
             try {
                 const response = await fetch("{% url 'stockslist:live_profit' %}");
                 const data = await response.json();
-                data.forEach((stock) => {
-                    const fieldset = document.querySelector(`.${stock.id}`);
+                data.data.forEach((stock) => {
+                    const fieldset = document.querySelector(`.purchase-${stock.id}`);
                     if (fieldset) {
                         fieldset.querySelector(".profit").innerHTML = `<strong>Profit/Loss:</strong> ₹${stock.profit.toFixed(2)}`;
                         fieldset.querySelector(".lastPrice").innerHTML = `<strong>Last Price:</strong> ₹${stock.lastPrice.toFixed(2)}`;
                     }
                 });
+                const amount = document.querySelector('.amount')
+                const realized_gain= document.querySelector('.realized_gain')
+                const unrealized_gain = document.querySelector('.unrealized_gain')
+                amount.innerHTML = `₹${data.userConfig.amount}`
+                realized_gain.innerHTML = `₹${data.userConfig.realized_gain}`
+                unrealized_gain.innerHTML = `₹${data.userConfig.unrealized_gain}`
+
+                
             } catch (error) {
                 console.error("Live update error: ", error);
             }

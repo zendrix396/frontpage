@@ -19,7 +19,10 @@
 }
 
 .success-card {
-    max-width: 500px;
+    /* max-width: 500px; */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     margin: 0 auto;
     text-align: center;
 }
@@ -222,15 +225,8 @@
         gap: 0.75rem;
     }
     
-    .dashboard-item {
-        max-width: 350px;
-        padding: 1.25rem;
-        margin: 0.25rem;
-    }
-    
-    .success-card {
-        max-width: 100%;
-    }
+  
+
 }
 
 @media (max-width: 480px) {
