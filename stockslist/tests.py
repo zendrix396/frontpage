@@ -41,7 +41,7 @@ class StockslistTests(TestCase):
         self.assertEqual(response.status_code, 302)  # Redirect to login
 
     def test_dashboard_authenticated(self):
-        self.client.login(username='trader', password='tradepass')
+        self.client.force_login(self.user)
         response = self.client.get(self.dashboard_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Dashboard')
@@ -51,7 +51,7 @@ class StockslistTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_buy_stock_success(self):
-        self.client.login(username='trader', password='tradepass')
+        self.client.force_login(self.user)
         self.user_creds.amount = 1000
         self.user_creds.save()
         response = self.client.post(self.buy_url, {
@@ -67,14 +67,14 @@ class StockslistTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_live_api_returns_json(self):
-        self.client.login(username='trader', password='tradepass')
+        self.client.force_login(self.user)
         live_api_url = reverse('stockslist:live_api')
         response = self.client.get(live_api_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json')
 
     def test_cannot_buy_more_than_budget(self):
-        self.client.login(username='trader', password='tradepass')
+        self.client.force_login(self.user)
         self.user_creds.amount = 10
         self.user_creds.save()
         response = self.client.post(self.buy_url, {
@@ -89,7 +89,7 @@ class StockslistTests(TestCase):
         stock2 = Stock.objects.create(symbol='GOOG', name='Google', lastPrice=200, dayHigh=210, dayLow=190, pChange=0)
         StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=2, brought_prize=100, profit=10)
         StockOwnership.objects.create(user=self.user_creds, symbol='GOOG', quantity=1, brought_prize=200, profit=20)
-        self.client.login(username='trader', password='tradepass')
+        self.client.force_login(self.user)
         response = self.client.get(self.dashboard_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'AAPL')
@@ -110,7 +110,7 @@ class StockslistTests(TestCase):
     def test_transaction_history(self):
         StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=1, brought_prize=100, profit=5, buy_time=timezone.now())
         StockOwnership.objects.create(user=self.user_creds, symbol='AAPL', quantity=2, brought_prize=110, profit=10, buy_time=timezone.now())
-        self.client.login(username='trader', password='tradepass')
+        self.client.force_login(self.user)
         response = self.client.get(self.dashboard_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'AAPL')
@@ -123,7 +123,7 @@ class StockslistTests(TestCase):
         self.user_creds.realized_gain = 0
         self.user_creds.amount = 999900
         self.user_creds.save()
-        self.client.login(username='trader', password='tradepass')
+        self.client.force_login(self.user)
         live_profit_url = reverse('stockslist:live_profit')
         response = self.client.get(live_profit_url)
         self.assertEqual(response.status_code, 200)
