@@ -10,7 +10,7 @@ CSRF_TRUSTED_ORIGINS = [
 CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_MAX_LOOP_INTERVAL = 3 # seconds
-
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 INSTALLED_APPS = [
     'django_celery_results', 
     'django_celery_beat',
