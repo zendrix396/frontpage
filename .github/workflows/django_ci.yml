@@ -1,4 +1,4 @@
-name: Linting and Coverage Check
+name: Django CI Check
 
 on:
   push:
